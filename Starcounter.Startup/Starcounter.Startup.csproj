@@ -1,7 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Platform>x64</Platform>
+    <Platforms>x64</Platforms>
+    <!-- .NET Framework doesn't display source information if portable pdb (the default) is used. See https://github.com/Microsoft/dotnet/blob/master/releases/net471/KnownIssues/517815-BCL%20Stack%20traces%20are%20missing%20source%20information%20for%20frames%20with%20debug%20information%20in%20the%20Portable%20PDB%20format.md  -->
+    <DebugType Condition="'$(Configuration)' == 'Debug'">full</DebugType>
+    <OutputPath>bin\$(Configuration)</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <TargetFramework>net462</TargetFramework>
+    <Version>0.1.0</Version>
+    <Authors>Starcounter, joozek78</Authors>
+    <PackageProjectUrl>https://github.com/Starcounter/Starcounter.Startup</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Starcounter/Starcounter.Startup</RepositoryUrl>
+    <PackageLicenseUrl>https://github.com/Starcounter/Starcounter.Startup/blob/master/LICENSE</PackageLicenseUrl>
+    <Description>Bootstrapping library for Starcounter applications. Highly recommended for new 2.4 projects</Description>
+    <PackageReleaseNotes>
+      Initial release
+    </PackageReleaseNotes>
+    <PackageTags>Starcounter</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

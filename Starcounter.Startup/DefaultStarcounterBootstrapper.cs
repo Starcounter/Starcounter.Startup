@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Starcounter.Startup.Abstractions;
+using Starcounter.Startup.Routing;
+using Starcounter.Startup.Routing.Middleware;
 
 namespace Starcounter.Startup
 {
@@ -13,9 +16,8 @@ namespace Starcounter.Startup
             Application.Current.Use(new HtmlFromJsonProvider());
             Application.Current.Use(new PartialToStandaloneHtmlProvider());
 
-            var services = new ServiceCollection()
-                .AddOptions()
-                .AddLogging(logging => logging.AddConsole());
+            var services = new ServiceCollection();
+            AddDefaultServices(services);
             application.ConfigureServices(services);
             
             var serviceProvider = services.BuildServiceProvider();
@@ -33,6 +35,14 @@ namespace Starcounter.Startup
 
             configure(applicationBuilder);
             logger.LogInformation($"Started application {application}");
+        }
+
+        private static void AddDefaultServices(IServiceCollection services)
+        {
+            services
+                .AddOptions()
+                .AddLogging(logging => logging.AddConsole());
+            services.TryAddEnumerable(ServiceDescriptor.Transient<IPageMiddleware, ContextMiddleware>());
         }
     }
 }

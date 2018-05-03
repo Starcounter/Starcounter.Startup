@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Starcounter.Startup.Routing.Activation;
+using Starcounter.Startup.Routing.Middleware;
 
 namespace Starcounter.Startup.Routing
 {

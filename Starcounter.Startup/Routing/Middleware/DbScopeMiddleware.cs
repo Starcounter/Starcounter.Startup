@@ -7,7 +7,7 @@ namespace Starcounter.Startup.Routing.Middleware
     {
         private readonly bool _defaultValue;
 
-        public DbScopeMiddleware(bool defaultValue)
+        public DbScopeMiddleware(bool defaultValue = true)
         {
             _defaultValue = defaultValue;
         }

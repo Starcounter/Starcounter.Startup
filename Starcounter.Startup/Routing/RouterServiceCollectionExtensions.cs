@@ -19,5 +19,13 @@ namespace Starcounter.Startup.Routing
         public static Router GetRouter(this IServiceProvider services) =>
             services.GetRequiredService<Router>();
 
+        public static IServiceCollection AddDbScopeMiddleware(this IServiceCollection services, bool enableScopeByDefault = true)
+        {
+            services
+                .TryAddEnumerable(
+                    ServiceDescriptor.Transient<IPageMiddleware>((_) => new DbScopeMiddleware(enableScopeByDefault)));
+            return services;
+        }
+
     }
 }

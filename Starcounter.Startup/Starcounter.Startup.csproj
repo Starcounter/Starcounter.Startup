@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Platform>x64</Platform>
@@ -8,14 +8,14 @@
     <OutputPath>bin\$(Configuration)</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <TargetFramework>net462</TargetFramework>
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
     <Authors>Starcounter, joozek78</Authors>
     <PackageProjectUrl>https://github.com/Starcounter/Starcounter.Startup</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Starcounter/Starcounter.Startup</RepositoryUrl>
     <PackageLicenseUrl>https://github.com/Starcounter/Starcounter.Startup/blob/master/LICENSE</PackageLicenseUrl>
     <Description>Bootstrapping library for Starcounter applications. Highly recommended for new 2.4 projects</Description>
     <PackageReleaseNotes>
-      Add ContextMiddleware to default services
+      Add AddDbScopeMiddleware extension method on IServiceCollection.
     </PackageReleaseNotes>
     <PackageTags>Starcounter</PackageTags>
   </PropertyGroup>

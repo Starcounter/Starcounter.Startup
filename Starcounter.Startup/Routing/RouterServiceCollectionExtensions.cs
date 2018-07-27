@@ -23,7 +23,7 @@ namespace Starcounter.Startup.Routing
         {
             services
                 .TryAddEnumerable(
-                    ServiceDescriptor.Transient<IPageMiddleware>((_) => new DbScopeMiddleware(enableScopeByDefault)));
+                    ServiceDescriptor.Transient<IPageMiddleware, DbScopeMiddleware>((_) => new DbScopeMiddleware(enableScopeByDefault)));
             return services;
         }
 

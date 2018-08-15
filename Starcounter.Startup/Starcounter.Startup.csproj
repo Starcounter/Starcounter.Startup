@@ -8,14 +8,14 @@
     <OutputPath>bin\$(Configuration)</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <TargetFramework>net462</TargetFramework>
-    <Version>0.3.0</Version>
+    <Version>0.3.1</Version>
     <Authors>Starcounter, joozek78</Authors>
     <PackageProjectUrl>https://github.com/Starcounter/Starcounter.Startup</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Starcounter/Starcounter.Startup</RepositoryUrl>
     <PackageLicenseUrl>https://github.com/Starcounter/Starcounter.Startup/blob/master/LICENSE</PackageLicenseUrl>
     <Description>Bootstrapping library for Starcounter applications. Highly recommended for new 2.4 projects</Description>
     <PackageReleaseNotes>
-      Add AddDbScopeMiddleware extension method on IServiceCollection.
+      Badly implemented IInitPageWithDependencies now causes Router to throw descriptive exception, instead of cryptic NullReferenceException.
     </PackageReleaseNotes>
     <PackageTags>Starcounter</PackageTags>
   </PropertyGroup>

@@ -42,7 +42,6 @@ namespace Starcounter.Startup
             services
                 .AddOptions()
                 .AddLogging(logging => logging.AddConsole());
-            services.TryAddEnumerable(ServiceDescriptor.Transient<IPageMiddleware, ContextMiddleware>());
         }
     }
 }

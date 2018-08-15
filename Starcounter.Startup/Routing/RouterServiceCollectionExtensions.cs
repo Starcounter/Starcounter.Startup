@@ -8,10 +8,17 @@ namespace Starcounter.Startup.Routing
 {
     public static class RouterServiceCollectionExtensions
     {
-        public static IServiceCollection AddRouter(this IServiceCollection services)
+        public static IServiceCollection AddRouter(this IServiceCollection services, bool addDefaultMiddleware = true)
         {
             services.TryAddSingleton<IPageCreator, DefaultPageCreator>();
             services.TryAddTransient<Router>();
+
+            if (addDefaultMiddleware)
+            {
+                // order of those is important. That way, ContextMiddleware will run inside DbScope
+                services.AddDbScopeMiddleware();
+                services.TryAddEnumerable(ServiceDescriptor.Transient<IPageMiddleware, ContextMiddleware>());
+            }
 
             return services;
         }

@@ -1,4 +1,6 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Starcounter.Startup.Routing;
 using Starcounter.Startup.Routing.Activation;
@@ -31,6 +33,24 @@ namespace Starcounter.Startup.Tests.Routing.Activation
                     });
 
             response.Resource.As<ContextPage>().Context.Should().BeSameAs(context);
+        }
+
+        [Test]
+        public void ShouldThrowMeaningfulExceptionWhenIInitWithDependenciesIsBadlyImplemented()
+        {
+            var defaultPageCreator = new DefaultPageCreator(new ServiceCollection().BuildServiceProvider());
+            defaultPageCreator.Invoking((creator) => creator.Create(new RoutingInfo()
+                {
+                    SelectedPageType = typeof(BadlyImplementedDependencies)
+                }))
+                .Should().Throw<InvalidOperationException>()
+                .WithInnerException<InvalidOperationException>()
+                .WithMessage(string.Format(Strings.DefaultPageCreator_TypeImplementsInitWithDependenciesBadly, nameof(IInitPageWithDependencies)));
+        }
+
+        public class BadlyImplementedDependencies : Json, IInitPageWithDependencies
+        {
+
         }
     }
 }

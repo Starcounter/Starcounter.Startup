@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Starcounter.Startup.Routing.Activation
 {
@@ -29,6 +31,10 @@ namespace Starcounter.Startup.Routing.Activation
                 if (_serviceProvider != null && page is IInitPageWithDependencies pageWithDependencies)
                 {
                     var init = routingInfo.SelectedPageType.GetMethod("Init", BindingFlags.Instance|BindingFlags.Public);
+                    if (init == null)
+                    {
+                        throw new InvalidOperationException(string.Format(Strings.DefaultPageCreator_TypeImplementsInitWithDependenciesBadly, nameof(IInitPageWithDependencies)));
+                    }
                     var arguments = init.GetParameters().Select(GetParamValue).ToArray();
                     init.Invoke(pageWithDependencies, arguments);
                 }
@@ -39,9 +45,9 @@ namespace Starcounter.Startup.Routing.Activation
                 PageContextSupport.HandleContext(page, routingInfo.Context);
                 return new Response() { Resource = (IResource)page };
             }
-            catch (Exception e)
+            catch (InvalidOperationException e)
             {
-                throw new Exception($"Could not create page of type '{routingInfo.SelectedPageType}'", e);
+                throw new InvalidOperationException(string.Format(Strings.DefaultPageCreator_CouldNotCreatePage, routingInfo.SelectedPageType), e);
             }
         }
 
@@ -49,17 +55,11 @@ namespace Starcounter.Startup.Routing.Activation
         {
             try
             {
-                var paramValue = _serviceProvider.GetService(parameter.ParameterType);
-                if (paramValue == null)
-                {
-                    throw new Exception($"Could not instantiate required service of type '{parameter.ParameterType}'");
-                }
-
-                return paramValue;
+                return _serviceProvider.GetRequiredService(parameter.ParameterType);
             }
-            catch (Exception e)
+            catch (InvalidOperationException e)
             {
-                throw new Exception($"Could not instantiate param '{parameter}'", e);
+                throw new InvalidOperationException(string.Format(Strings.DefaultPageCreator_CouldNotInstantiateParameter, parameter), e);
             }
         }
     }

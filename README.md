@@ -190,3 +190,61 @@ public void ConfigureServices(IServiceCollection services)
     // services.AddTransient<IPageMiddleware, ContextMiddleware>();
 }
 ```
+
+## Recipe: MasterPage
+
+To wrap every page marked with a specific attribute in a common view-model, you can use the following code:
+```c#
+using System;
+using System.Reflection;
+using Starcounter;
+using Starcounter.Startup.Routing;
+
+[AttributeUsage(AttributeTargets.Class)]
+public sealed class WrapAttribute : Attribute {}
+
+public class WrapperViewModel : Json
+{
+    public Json InnerViewModel { get; set; }
+}
+
+public class WrapperMiddleware : IPageMiddleware
+{
+    public Response Run(RoutingInfo routingInfo, Func<Response> next)
+    {
+        var originalResponse = next();
+        if (routingInfo.SelectedPageType.GetCustomAttribute<WrapAttribute>() == null)
+        {
+            return originalResponse;
+        }
+
+        return new WrapperViewModel {InnerViewModel = originalResponse};
+    }
+}
+```
+
+Remember to register it:
+```c#
+// using Microsoft.Extensions.DependencyInjection;
+// using Starcounter.Startup.Abstractions;
+// using Starcounter.Startup.Routing;
+
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddRouter();
+    services.AddTransient<IPageMiddleware, WrapperMiddleware>();
+}
+```
+
+To use it, mark your view-models with your new attribute:
+```c#
+using Starcounter;
+using Starcounter.Startup.Routing;
+
+[Url("/DogsApp/Dogs")]
+[Wrap]
+public partial class DogsViewModel: Json
+{
+  // ...
+}
+```

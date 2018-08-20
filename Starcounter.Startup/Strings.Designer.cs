@@ -86,5 +86,59 @@ namespace Starcounter.Startup {
                 return ResourceManager.GetString("DefaultPageCreator_TypeImplementsInitWithDependenciesBadly", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid application of attribute {0} in type {1}: {2}.
+        /// </summary>
+        internal static string ReflectionHelper_InvalidApplicationOfAttribute {
+            get {
+                return ResourceManager.GetString("ReflectionHelper_InvalidApplicationOfAttribute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Method marked with {0} should be public. Method {1} is not.
+        /// </summary>
+        internal static string ReflectionHelper_MethodNotPublic {
+            get {
+                return ResourceManager.GetString("ReflectionHelper_MethodNotPublic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Method marked with {0} should be static. Method {1} is not.
+        /// </summary>
+        internal static string ReflectionHelper_MethodNotStatic {
+            get {
+                return ResourceManager.GetString("ReflectionHelper_MethodNotStatic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Method marked with {0} should accept exactly one parameter of type {1}. Method {2} does not conform.
+        /// </summary>
+        internal static string ReflectionHelper_MethodShouldAcceptOneParameter {
+            get {
+                return ResourceManager.GetString("ReflectionHelper_MethodShouldAcceptOneParameter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please mark only one public static method with {0}. Marked methods: {1}.
+        /// </summary>
+        internal static string ReflectionHelper_MultipleMethods {
+            get {
+                return ResourceManager.GetString("ReflectionHelper_MultipleMethods", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Method marked with {0} should return {1} or its subclass. Method {2} does not conform.
+        /// </summary>
+        internal static string ReflectionHelper_WrongReturnType {
+            get {
+                return ResourceManager.GetString("ReflectionHelper_WrongReturnType", resourceCulture);
+            }
+        }
     }
 }

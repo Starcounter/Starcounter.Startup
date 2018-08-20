@@ -45,7 +45,7 @@ namespace Starcounter.Startup.Tests.Routing.Activation
                 }))
                 .Should().Throw<InvalidOperationException>()
                 .WithInnerException<InvalidOperationException>()
-                .WithMessage(string.Format(Strings.DefaultPageCreator_TypeImplementsInitWithDependenciesBadly, nameof(IInitPageWithDependencies)));
+                .WithMessage(StringsFormatted.DefaultPageCreator_TypeImplementsInitWithDependenciesBadly());
         }
 
         public class BadlyImplementedDependencies : Json, IInitPageWithDependencies

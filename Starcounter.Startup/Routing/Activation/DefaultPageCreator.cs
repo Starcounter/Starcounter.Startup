@@ -33,7 +33,7 @@ namespace Starcounter.Startup.Routing.Activation
                     var init = routingInfo.SelectedPageType.GetMethod("Init", BindingFlags.Instance|BindingFlags.Public);
                     if (init == null)
                     {
-                        throw new InvalidOperationException(string.Format(Strings.DefaultPageCreator_TypeImplementsInitWithDependenciesBadly, nameof(IInitPageWithDependencies)));
+                        throw new InvalidOperationException(StringsFormatted.DefaultPageCreator_TypeImplementsInitWithDependenciesBadly());
                     }
                     var arguments = init.GetParameters().Select(GetParamValue).ToArray();
                     init.Invoke(pageWithDependencies, arguments);
@@ -47,7 +47,7 @@ namespace Starcounter.Startup.Routing.Activation
             }
             catch (InvalidOperationException e)
             {
-                throw new InvalidOperationException(string.Format(Strings.DefaultPageCreator_CouldNotCreatePage, routingInfo.SelectedPageType), e);
+                throw new InvalidOperationException(StringsFormatted.DefaultPageCreator_CouldNotCreatePage(routingInfo.SelectedPageType), e);
             }
         }
 
@@ -59,7 +59,7 @@ namespace Starcounter.Startup.Routing.Activation
             }
             catch (InvalidOperationException e)
             {
-                throw new InvalidOperationException(string.Format(Strings.DefaultPageCreator_CouldNotInstantiateParameter, parameter), e);
+                throw new InvalidOperationException(StringsFormatted.DefaultPageCreator_CouldNotInstantiateParameter(parameter), e);
             }
         }
     }

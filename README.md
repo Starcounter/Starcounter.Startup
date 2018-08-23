@@ -1,6 +1,21 @@
 # Starcounter.Startup
 Dependency injection for Starcounter 2.4
 
+## Table of contents
+
+- [Installation](#installation)
+- [Getting started](#getting-started)
+- [Router](#router)
+  * [Registering view-models with UrlAttribute](#registering-view-models-with-urlattribute)
+  * [Registering view-models manually](#registering-view-models-manually)
+  * [Middleware](#middleware)
+  * [Recipe: MasterPage](#recipe-masterpage)
+- [Dependency injection in view-models](#dependency-injection-in-view-models)
+  * [Services registered by default](#services-registered-by-default)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
+
 ## Installation
 
 [This package is available on nuget](https://www.nuget.org/packages/Starcounter.Startup/). You can get it there. To install with CLI run:
@@ -109,31 +124,7 @@ public void Configure(IApplicationBuilder applicationBuilder)
 
 The snippet above will register a handler under "/DogsApp/partial/Dogs". This handler will return `DogViewModel`, but will only be available via `Self.Get`.
 
-## Dependency injection in view-models
-
-To use services from the DI container in your view-model, implement marker interface `IInitPageWithDependencies` and create public, non-static, void `Init` method that accepts your dependencies as parameters.
-This method mimics constructor, because Starcounter 2.4 doesn't support custom constructors in Typed Json view-models.
-
-```c#
-// using Starcounter.Startup.Routing.Activation;
-
-public partial class DogViewModel: Json, IInitPageWithDependencies
-{
-    public void Init(IDogService dogService)
-    {
-      _dogService = dogService;
-    }
-}
-```
-
-When an instance of this class is created by the `Router`, it will have its dependencies injected using `Init` method.
-
-## Services registered by default
-
-`DefaultStarcounterBootstrapper` registers two aspnet.core's features by default - [logging](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-2.1) and [options](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-2.1&tabs=basicconfiguration). You can read about them on [docs.microsoft.com](https://docs.microsoft.com).
-All logs are printed on Standard Output by default.
-
-## Middleware
+### Middleware
 
 Sometimes you want to define a behavior that will be applied to all the requests processed by the `Router`.
 To achieve this, implement `Starcounter.Startup.Routing.IPageMiddleware` interface and register it in the DI container.
@@ -191,7 +182,7 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-## Recipe: MasterPage
+### Recipe: MasterPage
 
 To wrap every page marked with a specific attribute in a common view-model, you can use the following code:
 ```c#
@@ -248,3 +239,28 @@ public partial class DogsViewModel: Json
   // ...
 }
 ```
+
+
+## Dependency injection in view-models
+
+To use services from the DI container in your view-model, implement marker interface `IInitPageWithDependencies` and create public, non-static, void `Init` method that accepts your dependencies as parameters.
+This method mimics constructor, because Starcounter 2.4 doesn't support custom constructors in Typed Json view-models.
+
+```c#
+// using Starcounter.Startup.Routing.Activation;
+
+public partial class DogViewModel: Json, IInitPageWithDependencies
+{
+    public void Init(IDogService dogService)
+    {
+      _dogService = dogService;
+    }
+}
+```
+
+When an instance of this class is created by the `Router`, it will have its dependencies injected using `Init` method.
+
+### Services registered by default
+
+`DefaultStarcounterBootstrapper` registers two aspnet.core's features by default - [logging](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-2.1) and [options](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-2.1&tabs=basicconfiguration). You can read about them on [docs.microsoft.com](https://docs.microsoft.com).
+All logs are printed on Standard Output by default.

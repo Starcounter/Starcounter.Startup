@@ -111,11 +111,23 @@ The snippet above will register a handler under "/DogsApp/partial/Dogs". This ha
 
 ## Dependency injection in view-models
 
-To use services from the DI container in your view-model, implement marker interface `IInitPageWithDependencies` and create public, non-static, void `Init` method that accepts your dependencies as parameters.
-This method mimics constructor, because Starcounter 2.4 doesn't support custom constructors in Typed Json view-models.
+To use services from the DI container in your view-model, declare a constructor that accepts dependencies as arguments. For more information about Dependency Injection, consult [microsoft docs on DI](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection). 
+
+```c#
+public partial class DogViewModel: Json
+{
+    public DogViewModel(IDogService dogService)
+    {
+      _dogService = dogService;
+    }
+}
+```
+
+For a long time, Starcounter didn't support constructor injection, and used `IInitPageWithDependncies` marker interface instead. You would it and create public, non-static, void `Init` method that accepted your dependencies as parameters. Below is an example of that practice. It can be now safely converted to constructor injection.
 
 ```c#
 // using Starcounter.Startup.Routing.Activation;
+// LEGACY CODE
 
 public partial class DogViewModel: Json, IInitPageWithDependencies
 {
@@ -125,8 +137,6 @@ public partial class DogViewModel: Json, IInitPageWithDependencies
     }
 }
 ```
-
-When an instance of this class is created by the `Router`, it will have its dependencies injected using `Init` method.
 
 ## Services registered by default
 

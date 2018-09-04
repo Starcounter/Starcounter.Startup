@@ -14,7 +14,9 @@ namespace Starcounter.Startup
             String.Format(Strings.DefaultPageCreator_CouldNotInstantiateParameter, parameterInfo);
 
         public static string DefaultPageCreator_TypeImplementsInitWithDependenciesBadly() =>
+#pragma warning disable 618
             String.Format(Strings.DefaultPageCreator_TypeImplementsInitWithDependenciesBadly, nameof(IInitPageWithDependencies));
+#pragma warning restore 618
 
         public static string ReflectionHelper_MultipleMethods(Type attribute, IEnumerable<MethodInfo> methodsWithAttribute) =>
             String.Format(Strings.ReflectionHelper_MultipleMethods,

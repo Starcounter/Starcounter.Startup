@@ -11,46 +11,91 @@ namespace Starcounter.Startup.Tests.Routing.Activation
 {
     public class DefaultPageCreatorTests
     {
+        private DefaultPageCreator _sut;
+        private const string InjectedValue = "injected value";
+
+        [SetUp]
+        public void SetUp()
+        {
+            var serviceProvider = new ServiceCollection()
+                .AddSingleton(InjectedValue)
+                .BuildServiceProvider();
+            _sut = new DefaultPageCreator(serviceProvider);
+        }
         [Test]
         public void ShouldCallInit()
         {
-            var defaultPageCreator = new DefaultPageCreator();
-            var response = defaultPageCreator.Create(new RoutingInfo() {SelectedPageType = typeof(InitPage)});
+            var page = CreatePage<InitPage>();
 
-            response.Resource.As<InitPage>().HasBeenInitialized.Should().BeTrue();
+            page.HasBeenInitialized.Should().BeTrue();
+        }
+
+        [Test]
+        public void ShouldHandleConstructorInjection()
+        {
+            var page = CreatePage<ConstructorInjection>();
+
+            page.Injected.Should().Be(InjectedValue);
         }
 
         [Test]
         public void ShouldCallHandleContextSupport()
         {
-            var defaultPageCreator = new DefaultPageCreator();
             var context = new Thing();
-            var response = defaultPageCreator.Create(
-                    new RoutingInfo()
-                    {
-                        SelectedPageType = typeof(ContextPage),
-                        Context = context
-                    });
+            var page = CreatePage<ContextPage>(context);
 
-            response.Resource.As<ContextPage>().Context.Should().BeSameAs(context);
+            page.Context.Should().BeSameAs(context);
         }
 
         [Test]
         public void ShouldThrowMeaningfulExceptionWhenIInitWithDependenciesIsBadlyImplemented()
         {
-            var defaultPageCreator = new DefaultPageCreator(new ServiceCollection().BuildServiceProvider());
-            defaultPageCreator.Invoking((creator) => creator.Create(new RoutingInfo()
-                {
-                    SelectedPageType = typeof(BadlyImplementedDependencies)
-                }))
+            new object().Invoking(o => CreatePage<BadlyImplementedDependencies>())
                 .Should().Throw<InvalidOperationException>()
                 .WithInnerException<InvalidOperationException>()
                 .WithMessage(StringsFormatted.DefaultPageCreator_TypeImplementsInitWithDependenciesBadly());
         }
 
-        public class BadlyImplementedDependencies : Json, IInitPageWithDependencies
+        private T CreatePage<T>(object context = null)
+        {
+            var response = _sut.Create(new RoutingInfo()
+            {
+                SelectedPageType = typeof(T),
+                Context = context
+            });
+
+            response.Resource.Should().BeOfType(typeof(T));
+            return (T) response.Resource;
+        }
+
+#pragma warning disable 618
+        private class BadlyImplementedDependencies : Json, IInitPageWithDependencies
+#pragma warning restore 618
         {
 
         }
+
+        private class ConstructorInjection: Json
+        {
+            public string Injected { get; }
+
+            public ConstructorInjection(string injected)
+            {
+                Injected = injected;
+            }
+        }
+
+#pragma warning disable 618
+        private class InitPage : Json, IInitPage
+#pragma warning restore 618
+        {
+            public bool HasBeenInitialized { get; private set; }
+
+            public void Init()
+            {
+                HasBeenInitialized = true;
+            }
+        }
+
     }
 }

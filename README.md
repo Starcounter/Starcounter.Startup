@@ -1,6 +1,22 @@
 # Starcounter.Startup
 Dependency injection for Starcounter 2.4
 
+## Table of contents
+
+- [Installation](#installation)
+- [Getting started](#getting-started)
+- [Router](#router)
+  * [Registering view-models with UrlAttribute](#registering-view-models-with-urlattribute)
+  * [Registering view-models manually](#registering-view-models-manually)
+  * [Handling URI parameters, working with Context](#handling-uri-parameters-working-with-context)
+  * [Middleware](#middleware)
+  * [Recipe: MasterPage](#recipe-masterpage)
+- [Dependency injection in view-models](#dependency-injection-in-view-models)
+  * [Services registered by default](#services-registered-by-default)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
+
 ## Installation
 
 [This package is available on nuget](https://www.nuget.org/packages/Starcounter.Startup/). You can get it there. To install with CLI run:
@@ -109,41 +125,83 @@ public void Configure(IApplicationBuilder applicationBuilder)
 
 The snippet above will register a handler under "/DogsApp/partial/Dogs". This handler will return `DogViewModel`, but will only be available via `Self.Get`.
 
-## Dependency injection in view-models
+### Handling URI parameters, working with Context
 
-To use services from the DI container in your view-model, declare a constructor that accepts dependencies as arguments. For more information about Dependency Injection, consult [microsoft docs on DI](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection). 
+In most cases when you use URI parameters, they correspond to a database entity of type `T` and your view-model implements `IBound<T>`. This case, illustrated below, is handled automatically:
 
 ```c#
-public partial class DogViewModel: Json
+// using Starcounter.Startup.Routing;
+
+[Url("/DogsApp/Dog/{?}")]
+public partial class DogViewModel: Json, IBound<Dog>
 {
-    public DogViewModel(IDogService dogService)
-    {
-      _dogService = dogService;
-    }
+    // ...
 }
 ```
 
-For a long time, Starcounter didn't support constructor injection, and used `IInitPageWithDependncies` marker interface instead. You would it and create public, non-static, void `Init` method that accepted your dependencies as parameters. Below is an example of that practice. It can be now safely converted to constructor injection.
+In the example below, if you open URI `/DogsApp/Dog/123`, then:
+* Router (more specifically, `ContextMiddleware`) will look for a `Dog` with id `123` in the database
+* If it's not found, then `404` response will be returned
+* If it's found, then `DogViewModel` will be initialized, and then its `Data` property will be populated with the `Dog` found in the database
+
+This is usually the desired behavior and if it satisfies you, can skip the rest of this chapter.
+
+To understand how this works you first need to know what Context is. Context is the data represented by URI arguments. If the URI has a `Dog` id a parameter `123` (`/DogsApp/Dog/123`), then Context is the `Dog` entity with id `123`.
+
+If the view-model implements `IBound<T>`, then the type of the Context is inferred to be `T`. You can, however override this by implementing `IPageContext<T>` interface. Consider following example:
+
+You want the following view-model to be accessible by ID of the `Dog`. i.e. accessing `/DogsApp/Dog/123/Owner` should initialize `DogOwnerViewModel.Data` to the *owner* of the `Dog` with id `123`.
 
 ```c#
-// using Starcounter.Startup.Routing.Activation;
-// LEGACY CODE
+// using Starcounter.Startup.Routing;
 
-public partial class DogViewModel: Json, IInitPageWithDependencies
+[Url("/DogsApp/Dog/{?}/Owner")]
+public partial class DogOwnerViewModel: Json, IBound<Person>, IPageContext<Dog>
 {
-    public void Init(IDogService dogService)
+    public void HandleContext(Dog context)
     {
-      _dogService = dogService;
+        this.Data = context.Owner;
     }
+
+    // ...
 }
 ```
 
-## Services registered by default
+Here, the context type would've been inferred to `Person`, but we explicitly declared it to be `Dog`. To implement the interface we also had to specify what happens with the context. If you don't implement this interface, but implement `IBound<T>`, the context is simply assigned to `Data` property.
 
-`DefaultStarcounterBootstrapper` registers two aspnet.core's features by default - [logging](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-2.1) and [options](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-2.1&tabs=basicconfiguration). You can read about them on [docs.microsoft.com](https://docs.microsoft.com).
-All logs are printed on Standard Output by default.
+But how is this context object fetched? By default, if the URI has only one parameter and Context is a database entity, the parameter value is used to fetch the Context from the database. However, if one of those conditions are not met or you want to override the default behavior, you must use `[UriToContext]`:
 
-## Middleware
+```c#
+// using Starcounter.Startup.Routing;
+// using Starcounter.Linq;
+
+[Url("/DogsApp/DogByName/{?}")]
+public partial class DogViewModel: Json, IBound<Dog>
+{
+    [UriToContext]
+    public static Dog HandleContext(string[] args)
+    {
+        // args is guaranteed to have one element, because its only URI has only one parameter
+        // returning null will cause the Router to respond with 404
+        return DbLinq.Objects<Dog>().FirstOrDefault(dog => dog.Name == args[0]);
+    }
+
+    // ...
+}
+```
+
+In this example instead of fetching the Context by its ID, we fetch it using its `Name` property.
+To use `[UriToContext]`, apply it to one method that:
+
+* is `public static`
+* has return type assignable to Context type
+* has only one parameter of type `string[]`
+
+This method will be invoked before the view-model is created. It will be passed URI parameters as its sole argument. If it returns null, the `Router` will respond with `404`. Otherwise, the return value will be used as the `Context`.
+
+`[UriToContext]` and `IPageMiddleware<T>` features are connected, but independent. You can use them both or just one them.
+
+### Middleware
 
 Sometimes you want to define a behavior that will be applied to all the requests processed by the `Router`.
 To achieve this, implement `Starcounter.Startup.Routing.IPageMiddleware` interface and register it in the DI container.
@@ -201,7 +259,7 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-## Recipe: MasterPage
+### Recipe: MasterPage
 
 To wrap every page marked with a specific attribute in a common view-model, you can use the following code:
 ```c#
@@ -258,3 +316,37 @@ public partial class DogsViewModel: Json
   // ...
 }
 ```
+
+## Dependency injection in view-models
+
+To use services from the DI container in your view-model, declare a constructor that accepts dependencies as arguments. For more information about Dependency Injection, consult [microsoft docs on DI](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection). 
+
+```c#
+public partial class DogViewModel: Json
+{
+    public DogViewModel(IDogService dogService)
+    {
+      _dogService = dogService;
+    }
+}
+```
+
+For a long time, Starcounter didn't support constructor injection, and used `IInitPageWithDependncies` marker interface instead. You would it and create public, non-static, void `Init` method that accepted your dependencies as parameters. Below is an example of that practice. It can be now safely converted to constructor injection.
+
+```c#
+// using Starcounter.Startup.Routing.Activation;
+// LEGACY CODE
+
+public partial class DogViewModel: Json, IInitPageWithDependencies
+{
+    public void Init(IDogService dogService)
+    {
+      _dogService = dogService;
+    }
+}
+```
+
+### Services registered by default
+
+`DefaultStarcounterBootstrapper` registers two aspnet.core's features by default - [logging](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-2.1) and [options](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-2.1&tabs=basicconfiguration). You can read about them on [docs.microsoft.com](https://docs.microsoft.com).
+All logs are printed on Standard Output by default.

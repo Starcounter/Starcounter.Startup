@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Starcounter.Startup.Routing
 {
@@ -9,12 +10,13 @@ namespace Starcounter.Startup.Routing
         /// <summary>
         /// Returns a method from specified type, marked with specified attribute.
         /// If this method is not public and static or its return type or parameter type doesn't match the requirement
-        /// or if it doesn't accept exactly one parameter, this method will throw an exception.
+        /// or if it doesn't accept the required parameter, this method will throw an exception.
         /// </summary>
         /// <param name="inspectedType">The type in which the method is sought</param>
         /// <param name="attribute">The attribute with which the sought method should be marked</param>
         /// <param name="expectedParameterType">The required parameter type for the method.
-        ///  If the method doesn't accept exactly one parameter it throws an exception</param>
+        ///  The seeked method can accept more parameters, but if it doesn't accept any or if the first one has type
+        ///  different than <paramref name="expectedParameterType"/> then this method will throw exception</param>
         /// <param name="expectedReturnType">The required return type for the method</param>
         /// <returns>The found method handle or null if no method with specified attribute exists in specified type</returns>
         public static MethodInfo GetStaticMethodWithAttribute(
@@ -63,16 +65,33 @@ namespace Starcounter.Startup.Routing
                 throw BuildException(attribute, inspectedType,
                     StringsFormatted.ReflectionHelper_WrongReturnType(attribute, expectedReturnType, methodWithAttribute));
             }
-            if (!methodWithAttribute.GetParameters()
+            if (methodWithAttribute.GetParameters()
                 .Select(p => p.ParameterType)
-                .ToArray()
-                .SequenceEqual(new[] { expectedParameterType }))
+                .FirstOrDefault() != expectedParameterType )
             {
                 throw BuildException(attribute, inspectedType,
                     StringsFormatted.ReflectionHelper_MethodShouldAcceptOneParameter(attribute, expectedParameterType, methodWithAttribute));
             }
 
             return methodWithAttribute;
+        }
+
+        /// <summary>
+        /// Returns a value for parameter resolved from a service provider.
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <param name="serviceProvider"></param>
+        /// <returns></returns>
+        public static object GetParamValue(ParameterInfo parameter, IServiceProvider serviceProvider)
+        {
+            try
+            {
+                return serviceProvider.GetRequiredService(parameter.ParameterType);
+            }
+            catch (InvalidOperationException e)
+            {
+                throw new InvalidOperationException(StringsFormatted.ReflectionHelper_CouldNotInstantiateParameter(parameter), e);
+            }
         }
 
         private static Exception BuildException(Type attribute, Type inspectedType, string details)

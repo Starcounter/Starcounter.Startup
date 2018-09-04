@@ -61,6 +61,42 @@ namespace Starcounter.Startup {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There should be exactly one URI argument that is ID of {0} object in DB. If you want to create context manually use {1}.
+        /// </summary>
+        internal static string ContextMiddleware_ContextIsDbSoUriShouldHaveOneArgument {
+            get {
+                return ResourceManager.GetString("ContextMiddleware_ContextIsDbSoUriShouldHaveOneArgument", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not create context of type {0} for view-model of type {1}: {2}.
+        /// </summary>
+        internal static string ContextMiddleware_CouldNotCreateContext {
+            get {
+                return ResourceManager.GetString("ContextMiddleware_CouldNotCreateContext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not resolve dependency of method {0}.
+        /// </summary>
+        internal static string ContextMiddleware_CouldNotResolveUriToContextDependencies {
+            get {
+                return ResourceManager.GetString("ContextMiddleware_CouldNotResolveUriToContextDependencies", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please mark {0} as IBound to a database type or use {1}.
+        /// </summary>
+        internal static string ContextMiddleware_MarkViewModelAsIBoundOrUriToContext {
+            get {
+                return ResourceManager.GetString("ContextMiddleware_MarkViewModelAsIBoundOrUriToContext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not create page of type &apos;{0}&apos;.
         /// </summary>
         internal static string DefaultPageCreator_CouldNotCreatePage {
@@ -115,7 +151,7 @@ namespace Starcounter.Startup {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Method marked with {0} should accept exactly one parameter of type {1}. Method {2} does not conform.
+        ///   Looks up a localized string similar to Method marked with {0} should accept first parameter of type {1}. Method {2} does not conform.
         /// </summary>
         internal static string ReflectionHelper_MethodShouldAcceptOneParameter {
             get {

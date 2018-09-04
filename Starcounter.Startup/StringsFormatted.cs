@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Starcounter.Startup.Routing;
 using Starcounter.Startup.Routing.Activation;
 
 namespace Starcounter.Startup
@@ -10,7 +11,7 @@ namespace Starcounter.Startup
         public static string DefaultPageCreator_CouldNotCreatePage(Type type) =>
             String.Format(Strings.DefaultPageCreator_CouldNotCreatePage, type);
 
-        public static string DefaultPageCreator_CouldNotInstantiateParameter(ParameterInfo parameterInfo) =>
+        public static string ReflectionHelper_CouldNotInstantiateParameter(ParameterInfo parameterInfo) =>
             String.Format(Strings.DefaultPageCreator_CouldNotInstantiateParameter, parameterInfo);
 
         public static string DefaultPageCreator_TypeImplementsInitWithDependenciesBadly() =>
@@ -32,7 +33,7 @@ namespace Starcounter.Startup
                 attribute.Name, expectedParameterType.Name, methodWithAttribute);
 
         public static string ReflectionHelper_WrongReturnType(Type attribute, Type expectedReturnType, MethodInfo methodWithAttribute) =>
-            string.Format(Strings.ReflectionHelper_MethodShouldAcceptOneParameter,
+            string.Format(Strings.ReflectionHelper_WrongReturnType,
                 attribute.Name, expectedReturnType.Name, methodWithAttribute);
 
         public static string ReflectionHelper_MethodNotStatic(Type attribute, MethodInfo methodWithAttribute) =>
@@ -42,5 +43,17 @@ namespace Starcounter.Startup
         public static string ReflectionHelper_MethodNotPublic(Type attribute, MethodInfo methodWithAttribute) =>
             string.Format(Strings.ReflectionHelper_MethodNotPublic,
                 attribute.Name, methodWithAttribute);
+
+        public static string ContextMiddleware_CouldNotCreateContext(Type contextType, Type viewModelType, string details) =>
+            string.Format(Strings.ContextMiddleware_CouldNotCreateContext, contextType, viewModelType, details);
+
+        public static string ContextMiddleware_ContextIsDbSoUriShouldHaveOneArgument(Type contextType) =>
+            string.Format(Strings.ContextMiddleware_ContextIsDbSoUriShouldHaveOneArgument, contextType, nameof(UriToContextAttribute));
+
+        public static string ContextMiddleware_MarkViewModelAsIBoundOrUriToContext(Type contextType) =>
+            string.Format(Strings.ContextMiddleware_MarkViewModelAsIBoundOrUriToContext, contextType, nameof(UriToContextAttribute));
+
+        public static string ContextMiddleware_CouldNotResolveUriToContextDependencies(MethodInfo uriToContext) =>
+            string.Format(Strings.ContextMiddleware_CouldNotResolveUriToContextDependencies, uriToContext);
     }
 }

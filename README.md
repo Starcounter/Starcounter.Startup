@@ -179,11 +179,11 @@ But how is this context object fetched? By default, if the URI has only one para
 public partial class DogViewModel: Json, IBound<Dog>
 {
     [UriToContext]
-    public static Dog HandleContext(string[] args)
+    public static Dog HandleContext(string[] args, IDogsRepository dogsRepository)
     {
         // args is guaranteed to have one element, because its only URI has only one parameter
         // returning null will cause the Router to respond with 404
-        return DbLinq.Objects<Dog>().FirstOrDefault(dog => dog.Name == args[0]);
+        return dogsRepository.GetByName(args[0]);
     }
 
     // ...
@@ -195,9 +195,10 @@ To use `[UriToContext]`, apply it to one method that:
 
 * is `public static`
 * has return type assignable to Context type
-* has only one parameter of type `string[]`
+* has the first parameter of type `string[]`
 
 This method will be invoked before the view-model is created. It will be passed URI parameters as its sole argument. If it returns null, the `Router` will respond with `404`. Otherwise, the return value will be used as the `Context`.
+This method can accept more than one parameters. Any additional parameters will be treated as a dependency and resolved using Dependency Injection container.
 
 `[UriToContext]` and `IPageMiddleware<T>` features are connected, but independent. You can use them both or just one them.
 

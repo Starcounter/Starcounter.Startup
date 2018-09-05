@@ -198,7 +198,7 @@ To use `[UriToContext]`, apply it to one method that:
 * has the first parameter of type `string[]`
 
 This method will be invoked before the view-model is created. It will be passed URI parameters as its sole argument. If it returns null, the `Router` will respond with `404`. Otherwise, the return value will be used as the `Context`.
-This method can accept more than one parameters. Any additional parameters will be treated as a dependency and resolved using Dependency Injection container.
+This method can accept more than one parameter. Any additional parameters will be treated as a dependency and resolved using Dependency Injection container.
 
 `[UriToContext]` and `IPageMiddleware<T>` features are connected, but independent. You can use them both or just one them.
 

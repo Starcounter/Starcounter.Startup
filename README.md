@@ -332,7 +332,7 @@ public partial class DogViewModel: Json
 }
 ```
 
-For a long time, Starcounter didn't support constructor injection, and used `IInitPageWithDependncies` marker interface instead. You would it and create public, non-static, void `Init` method that accepted your dependencies as parameters. Below is an example of that practice. It can be now safely converted to constructor injection.
+For a long time, Starcounter didn't support constructor injection, and used `IInitPageWithDependncies` marker interface instead. You would implement it and create public, non-static, void `Init` method that accepted your dependencies as parameters. Below is an example of that practice. It can be now safely converted to constructor injection.
 
 ```c#
 // using Starcounter.Startup.Routing.Activation;
@@ -343,6 +343,61 @@ public partial class DogViewModel: Json, IInitPageWithDependencies
     public void Init(IDogService dogService)
     {
       _dogService = dogService;
+    }
+}
+```
+
+⚠️Only view-models created by the Router (those i.e. created automatically by accessing a URI) will have their dependncies filled. View-models nested inside other view-model, that are created by Starcounter, will not automatically be created with dependencies.
+
+```c#
+// WON'T WORK
+
+// AllDogsViewModel.json
+{
+    "Children": [ {} ]
+}
+
+// AllDogsViewModel.json.cs
+public partial class AllDogsViewModel: Json
+{
+    public DogViewModel(IDogService dogService)
+    {
+        Children.Data = dogService.GetAllDogs();
+    }
+
+    [AllDogsViewModel_json.Children]
+    public partial class ChildViewModel: Json
+    {
+        // this won't even compile
+        public ChildViewModel(IDogService dogService)
+        {
+            // ...
+        }
+    }
+}
+```
+
+To fill dependencies for a nested view-model you have to create it by hand:
+
+```c#
+// AllDogsViewModel.json.cs
+public partial class AllDogsViewModel: Json
+{
+    public DogViewModel(IDogService dogService)
+    {
+        foreach (var dog in dogService.GetAllDogs())
+        {
+            Children.Add().Init(dogService);
+        }
+    }
+
+    [AllDogsViewModel_json.Children]
+    public partial class ChildViewModel: Json
+    {
+        public void Init(IDogService dogService)
+        {
+            // ...
+        }
     }
 }
 ```

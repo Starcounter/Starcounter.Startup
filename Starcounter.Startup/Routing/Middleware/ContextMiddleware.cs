@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Starcounter.Advanced;
 
@@ -13,20 +15,20 @@ namespace Starcounter.Startup.Routing.Middleware
     /// attempt to retrieve the context from database.
     public class ContextMiddleware: IPageMiddleware
     {
-        private readonly PageContextSupport _pageContextSupport = new PageContextSupport();
         private readonly IObjectRetriever _objectRetriever;
+        private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
         /// </summary>
-        /// <param name="objectRetriever">This is used primarily by tests to "mock" the db access. Leave null to use DbHelper.FromID</param>
-        public ContextMiddleware(IObjectRetriever objectRetriever = null)
+        public ContextMiddleware(IObjectRetriever objectRetriever, IServiceProvider serviceProvider)
         {
-            _objectRetriever = objectRetriever ?? new DatabaseObjectRetriever();
+            _objectRetriever = objectRetriever ?? throw new ArgumentNullException(nameof(objectRetriever));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
         public Response Run(RoutingInfo routingInfo, Func<Response> next)
         {
-            var contextType = _pageContextSupport.GetContextType(routingInfo.SelectedPageType);
+            var contextType = PageContextSupport.GetContextType(routingInfo.SelectedPageType);
             if (contextType == null)
             {
                 return next();
@@ -44,52 +46,45 @@ namespace Starcounter.Startup.Routing.Middleware
 
         private object CreateContextFromUri(Type pageType, Type contextType, string[] arguments)
         {
+            Exception CreateException(string details, Exception inner = null) =>
+                new InvalidOperationException(StringsFormatted.ContextMiddleware_CouldNotCreateContext(contextType, pageType, details), inner);
+
             MethodInfo explicitUriToContext = GetExplicitUriToContext(pageType, contextType);
             if (explicitUriToContext != null)
             {
-                return explicitUriToContext.Invoke(null, new object[] { arguments });
+                try
+                {
+                    var resolvedArguments = explicitUriToContext
+                        .GetParameters()
+                        .Skip(1) // the first parameter is string[] args
+                        .Select(param => ReflectionHelper.GetParamValue(param, _serviceProvider));
+
+                    return explicitUriToContext.Invoke(null, new object[] { arguments }.Concat(resolvedArguments).ToArray());
+                }
+                catch (InvalidOperationException e)
+                {
+                    throw CreateException(
+                        StringsFormatted
+                            .ContextMiddleware_CouldNotResolveUriToContextDependencies(explicitUriToContext), e);
+                }
+
             }
             // i.e. is database object
             if (typeof(IBindable).IsAssignableFrom(contextType))
             {
                 if (arguments.Length != 1)
                 {
-                    throw new Exception($"Could not create context of type {contextType} for page of type {pageType}: " +
-                                        $"There should be exactly one URI argument that is ID of {contextType} object in DB. " +
-                                        $"If you want to create context manually use {nameof(UriToContextAttribute)}");
+                    throw CreateException(StringsFormatted.ContextMiddleware_ContextIsDbSoUriShouldHaveOneArgument(contextType));
                 }
                 return _objectRetriever.GetById(contextType, arguments[0]);
             }
-            throw new Exception($"Could not create context of type {contextType} for page {pageType}: " +
-                                $"Please mark {pageType} as IBound to a database type or use {nameof(UriToContextAttribute)}");
+
+            throw CreateException(StringsFormatted.ContextMiddleware_MarkViewModelAsIBoundOrUriToContext(contextType));
         }
 
         private MethodInfo GetExplicitUriToContext(Type pageType, Type contextType)
         {
             return ReflectionHelper.GetStaticMethodWithAttribute(pageType, typeof(UriToContextAttribute), typeof(string[]), contextType);
-        }
-
-        public interface IObjectRetriever
-        {
-            object GetById(Type desiredType, string id);
-        }
-
-        private class DatabaseObjectRetriever : IObjectRetriever
-        {
-            public object GetById(Type desiredType, string id)
-            {
-                ulong objectId;
-                try
-                {
-                    objectId = DbHelper.Base64DecodeObjectID(id);
-                }
-                catch (ArgumentException)
-                {
-                    return null; // in case a "random" string is supplied, it's leniently converted to int and FromID returns null
-                }
-                var obj = DbHelper.FromID(objectId);
-                return desiredType.IsInstanceOfType(obj) ? obj : null;
-            }
         }
     }
 }

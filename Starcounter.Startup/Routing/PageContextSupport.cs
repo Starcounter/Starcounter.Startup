@@ -14,7 +14,7 @@ namespace Starcounter.Startup.Routing
         /// </summary>
         /// <param name="pageType"></param>
         /// <returns>Context type if it can be determined, null otherwise</returns>
-        public Type GetContextType(Type pageType)
+        public static Type GetContextType(Type pageType)
         {
             return pageType.GetInterface($"{nameof(IPageContext<int>)}`1")?.GetGenericArguments().First()
                    ?? pageType.GetInterface($"{nameof(IBound<int>)}`1")?.GetGenericArguments().First();

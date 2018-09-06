@@ -1,4 +1,6 @@
-﻿namespace Starcounter.Startup.Routing.Activation
+﻿using System;
+
+namespace Starcounter.Startup.Routing.Activation
 {
     /// <summary>
     /// Implement this interface in a view-model and create a public void method called Init and accepting
@@ -23,6 +25,7 @@
     ///   }
     /// }
     ///  ]]></code></example>
+    [Obsolete("Declare a constructor instead")]
     public interface IInitPageWithDependencies
     {
     }

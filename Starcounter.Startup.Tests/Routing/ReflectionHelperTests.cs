@@ -115,6 +115,18 @@ namespace Starcounter.Startup.Tests.Routing
             AssertInspectingTypeReturns<ValidMarkedMethod>(typeof(ValidMarkedMethod).GetMethod(nameof(ValidMarkedMethod.Marked)));
         }
 
+        private class ValidMarkedMethodWithMoreParameters
+        {
+            [Mark]
+            public static int Marked(int arg, string arg2) => 0;
+        }
+
+        [Test]
+        public void ReturnsMethodInfoWhenMarkedMethodFitsAllCriteriaAndHasMoreParameters()
+        {
+            AssertInspectingTypeReturns<ValidMarkedMethodWithMoreParameters>(typeof(ValidMarkedMethodWithMoreParameters).GetMethod(nameof(ValidMarkedMethodWithMoreParameters.Marked)));
+        }
+
         private void AssertInspectingTypeThrows<TTargetType>(string expectedMessage)
         {
             new Action(() => ReflectionHelper.GetStaticMethodWithAttribute(

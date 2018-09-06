@@ -17,7 +17,7 @@ namespace Starcounter.Startup.Routing
             {
                 // order of those is important. That way, ContextMiddleware will run inside DbScope
                 services.AddDbScopeMiddleware();
-                services.TryAddEnumerable(ServiceDescriptor.Transient<IPageMiddleware, ContextMiddleware>());
+                services.AddContextMiddleware();
             }
 
             return services;
@@ -34,5 +34,11 @@ namespace Starcounter.Startup.Routing
             return services;
         }
 
+        public static IServiceCollection AddContextMiddleware(this IServiceCollection services)
+        {
+            services.TryAddTransient<IObjectRetriever, DatabaseObjectRetriever>();
+            services.TryAddEnumerable(ServiceDescriptor.Transient<IPageMiddleware, ContextMiddleware>());
+            return services;
+        }
     }
 }

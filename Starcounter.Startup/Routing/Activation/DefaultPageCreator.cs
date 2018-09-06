@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Starcounter.Startup.Routing.Activation
@@ -16,29 +15,29 @@ namespace Starcounter.Startup.Routing.Activation
 
         public DefaultPageCreator(IServiceProvider serviceProvider)
         {
-            _serviceProvider = serviceProvider;
-        }
-
-        public DefaultPageCreator()
-        {
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
         public Response Create(RoutingInfo routingInfo)
         {
             try
             {
-                var page = Activator.CreateInstance(routingInfo.SelectedPageType);
-                if (_serviceProvider != null && page is IInitPageWithDependencies pageWithDependencies)
+                var page = ActivatorUtilities.GetServiceOrCreateInstance(_serviceProvider, routingInfo.SelectedPageType);
+#pragma warning disable 618
+                if (page is IInitPageWithDependencies pageWithDependencies)
+#pragma warning restore 618
                 {
                     var init = routingInfo.SelectedPageType.GetMethod("Init", BindingFlags.Instance|BindingFlags.Public);
                     if (init == null)
                     {
                         throw new InvalidOperationException(StringsFormatted.DefaultPageCreator_TypeImplementsInitWithDependenciesBadly());
                     }
-                    var arguments = init.GetParameters().Select(GetParamValue).ToArray();
+                    var arguments = init.GetParameters().Select(parameter => ReflectionHelper.GetParamValue(parameter, _serviceProvider)).ToArray();
                     init.Invoke(pageWithDependencies, arguments);
                 }
+#pragma warning disable 618
                 if (page is IInitPage initPage)
+#pragma warning restore 618
                 {
                     initPage.Init();
                 }
@@ -48,18 +47,6 @@ namespace Starcounter.Startup.Routing.Activation
             catch (InvalidOperationException e)
             {
                 throw new InvalidOperationException(StringsFormatted.DefaultPageCreator_CouldNotCreatePage(routingInfo.SelectedPageType), e);
-            }
-        }
-
-        private object GetParamValue(ParameterInfo parameter)
-        {
-            try
-            {
-                return _serviceProvider.GetRequiredService(parameter.ParameterType);
-            }
-            catch (InvalidOperationException e)
-            {
-                throw new InvalidOperationException(StringsFormatted.DefaultPageCreator_CouldNotInstantiateParameter(parameter), e);
             }
         }
     }

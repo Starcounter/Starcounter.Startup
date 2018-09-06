@@ -136,12 +136,24 @@
     <value>Method marked with {0} should be static. Method {1} is not</value>
   </data>
   <data name="ReflectionHelper_MethodShouldAcceptOneParameter" xml:space="preserve">
-    <value>Method marked with {0} should accept exactly one parameter of type {1}. Method {2} does not conform</value>
+    <value>Method marked with {0} should accept first parameter of type {1}. Method {2} does not conform</value>
   </data>
   <data name="ReflectionHelper_MultipleMethods" xml:space="preserve">
     <value>Please mark only one public static method with {0}. Marked methods: {1}</value>
   </data>
   <data name="ReflectionHelper_WrongReturnType" xml:space="preserve">
     <value>Method marked with {0} should return {1} or its subclass. Method {2} does not conform</value>
+  </data>
+  <data name="ContextMiddleware_CouldNotCreateContext" xml:space="preserve">
+    <value>Could not create context of type {0} for view-model of type {1}: {2}</value>
+  </data>
+  <data name="ContextMiddleware_ContextIsDbSoUriShouldHaveOneArgument" xml:space="preserve">
+    <value>There should be exactly one URI argument that is ID of {0} object in DB. If you want to create context manually use {1}</value>
+  </data>
+  <data name="ContextMiddleware_MarkViewModelAsIBoundOrUriToContext" xml:space="preserve">
+    <value>Please mark {0} as IBound to a database type or use {1}</value>
+  </data>
+  <data name="ContextMiddleware_CouldNotResolveUriToContextDependencies" xml:space="preserve">
+    <value>Could not resolve dependency of method {0}</value>
   </data>
 </root>

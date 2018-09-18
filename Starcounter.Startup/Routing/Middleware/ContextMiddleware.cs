@@ -13,6 +13,9 @@ namespace Starcounter.Startup.Routing.Middleware
     /// for a page that implements either <see cref="IPageContext{T}"/> or <see cref="Starcounter.IBound{DataType}"/>. If the selected page type
     /// has a method marked with <see cref="UriToContextAttribute"/>, then it will be used. Otherwise, this middleware will
     /// attempt to retrieve the context from database.
+    /// <remarks>
+    /// This middleware is enabled by <see cref="RouterServiceCollectionExtensions.AddRouter"/> by default.
+    /// </remarks>
     public class ContextMiddleware: IPageMiddleware
     {
         private readonly IObjectRetriever _objectRetriever;

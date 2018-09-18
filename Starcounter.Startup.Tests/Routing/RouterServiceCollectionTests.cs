@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Starcounter.Startup.Routing;
@@ -18,8 +19,10 @@ namespace Starcounter.Startup.Tests.Routing
                 .AddLogging(builder => builder.ClearProviders());
 
             serviceCollection.AddRouter();
+            serviceCollection.Replace(
+                ServiceDescriptor.Transient<IApplicationNameProvider, FakeApplicationNameProvider>());
 
-            serviceCollection.BuildServiceProvider().GetService<Router>()
+            serviceCollection.BuildServiceProvider().GetService<IRouter>()
                 .Should().NotBeNull();
         }
 
@@ -73,5 +76,6 @@ namespace Starcounter.Startup.Tests.Routing
             serviceCollection.BuildServiceProvider().GetServices<IPageMiddleware>()
                 .Should().HaveCount(1);
         }
+
     }
 }

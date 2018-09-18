@@ -124,6 +124,15 @@ namespace Starcounter.Startup {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to created master page is null.
+        /// </summary>
+        internal static string MasterPageMiddleware_MasterPageIsNull {
+            get {
+                return ResourceManager.GetString("MasterPageMiddleware_MasterPageIsNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid application of attribute {0} in type {1}: {2}.
         /// </summary>
         internal static string ReflectionHelper_InvalidApplicationOfAttribute {
@@ -174,6 +183,33 @@ namespace Starcounter.Startup {
         internal static string ReflectionHelper_WrongReturnType {
             get {
                 return ResourceManager.GetString("ReflectionHelper_WrongReturnType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not supported: more than 4 parameters in URL.
+        /// </summary>
+        internal static string Router_MoreParametersNotSupported {
+            get {
+                return ResourceManager.GetString("Router_MoreParametersNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Registering URI &apos;{0}&apos; with type &apos;{1}&apos;.
+        /// </summary>
+        internal static string Router_RegisteringUri {
+            get {
+                return ResourceManager.GetString("Router_RegisteringUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type {0} has no {1} applied.
+        /// </summary>
+        internal static string Router_TypeHasNoUrlAttribute {
+            get {
+                return ResourceManager.GetString("Router_TypeHasNoUrlAttribute", resourceCulture);
             }
         }
     }

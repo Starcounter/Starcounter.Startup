@@ -55,5 +55,13 @@ namespace Starcounter.Startup
 
         public static string ContextMiddleware_CouldNotResolveUriToContextDependencies(MethodInfo uriToContext) =>
             string.Format(Strings.ContextMiddleware_CouldNotResolveUriToContextDependencies, uriToContext);
+
+        public static string MasterPageMiddleware_MasterPageIsNull() => Strings.MasterPageMiddleware_MasterPageIsNull;
+
+        public static string Router_TypeHasNoUrlAttribute(Type type) =>
+            string.Format(Strings.Router_TypeHasNoUrlAttribute, type, typeof(UrlAttribute));
+
+        public static string Router_RegisteringUri(string uri, Type type) =>
+            string.Format(Strings.Router_RegisteringUri, uri, type);
     }
 }

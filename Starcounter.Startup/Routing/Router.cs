@@ -5,46 +5,55 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Starcounter.Startup.Routing.Activation;
+using Starcounter.Startup.Routing.Middleware;
 
 namespace Starcounter.Startup.Routing
 {
-    public class Router
+    public class Router : IRouter
     {
         private readonly IPageCreator _pageCreator;
         private readonly ILogger<Router> _logger;
+        private readonly IPartialUriHelper _partialUriHelper;
         private readonly List<IPageMiddleware> _middleware;
 
-        public Router(IPageCreator pageCreator, IEnumerable<IPageMiddleware> middlewares, ILogger<Router> logger)
+        public Router(IPageCreator pageCreator,
+            IEnumerable<IPageMiddleware> middlewares,
+            ILogger<Router> logger,
+            IPartialUriHelper partialUriHelper)
         {
             _pageCreator = pageCreator;
             _logger = logger;
+            _partialUriHelper = partialUriHelper;
             _middleware = middlewares.ToList();
         }
 
-        public void HandleGet<T>(HandlerOptions handlerOptions = null)
-        {
-            HandleGet(typeof(T), handlerOptions);
-        }
-
+        /// <inheritdoc />
         public void HandleGet(Type pageType, HandlerOptions handlerOptions = null)
         {
-            var urlAttribute = pageType.GetCustomAttribute<UrlAttribute>();
-            if (urlAttribute == null)
+            var urlAttributes = pageType.GetCustomAttributes<UrlAttribute>().ToList();
+            if (!urlAttributes.Any())
             {
-                throw new Exception($"Type {pageType} has no Url attribute on it");
+                throw new Exception(StringsFormatted.Router_TypeHasNoUrlAttribute(pageType));
             }
 
-            HandleGet(urlAttribute.Value, pageType, handlerOptions);
+            foreach (var urlAttribute in urlAttributes)
+            {
+                var pageUri = urlAttribute.Value;
+                if (urlAttribute.AccessibleExternally)
+                {
+                    HandleGet(pageUri, pageType, handlerOptions);
+                }
+                if (urlAttribute.Blendable)
+                {
+                    HandleGet(_partialUriHelper.PageToPartial(pageUri), pageType, SelfOnlyHandlerOptions(handlerOptions));
+                }
+            }
         }
 
-        public void HandleGet<T>(string url, HandlerOptions handlerOptions = null)
-        {
-            HandleGet(url, typeof(T), handlerOptions);
-        }
-
+        /// <inheritdoc />
         public void HandleGet(string url, Type pageType, HandlerOptions handlerOptions = null)
         {
-            _logger.LogInformation($"Registering URI '{url}' with type '{pageType}'");
+            _logger.LogInformation(StringsFormatted.Router_RegisteringUri(url, pageType));
             var argumentsNo = Regex.Matches(url, @"\{\?\}").Count;
             switch (argumentsNo)
             {
@@ -74,8 +83,19 @@ namespace Starcounter.Startup.Routing
                         handlerOptions);
                     break;
                 default:
-                    throw new NotSupportedException("Not supported: more than 4 parameters in URL");
+                    throw new NotSupportedException(Strings.Router_MoreParametersNotSupported);
             }
+        }
+
+        private HandlerOptions SelfOnlyHandlerOptions(HandlerOptions original)
+        {
+            if (original == null)
+            {
+                return new HandlerOptions() {SelfOnly = true};
+            }
+
+            original.SelfOnly = true;
+            return original;
         }
 
         private Response RunResponse(Type pageType, Request request, params string[] arguments)

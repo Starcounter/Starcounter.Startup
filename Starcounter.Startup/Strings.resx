@@ -156,4 +156,16 @@
   <data name="ContextMiddleware_CouldNotResolveUriToContextDependencies" xml:space="preserve">
     <value>Could not resolve dependency of method {0}</value>
   </data>
+  <data name="MasterPageMiddleware_MasterPageIsNull" xml:space="preserve">
+    <value>created master page is null</value>
+  </data>
+  <data name="Router_TypeHasNoUrlAttribute" xml:space="preserve">
+    <value>Type {0} has no {1} applied</value>
+  </data>
+  <data name="Router_MoreParametersNotSupported" xml:space="preserve">
+    <value>Not supported: more than 4 parameters in URL</value>
+  </data>
+  <data name="Router_RegisteringUri" xml:space="preserve">
+    <value>Registering URI '{0}' with type '{1}'</value>
+  </data>
 </root>

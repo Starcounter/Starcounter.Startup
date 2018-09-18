@@ -107,6 +107,32 @@ public void Configure(IApplicationBuilder applicationBuilder)
 
 The snippets above will register a handler under "/DogsApp/Dogs" and "/DogsApp/AllDogs". This handler will return `DogViewModel`.
 
+### Exposing view-models to blending and browser
+
+By default, applying `[UrlAttribute]` will expose your view-model to the browser (or anyone who uses HTTP) under the supplied URI, and to the Blending Engine under the partial URI.
+
+```c#
+// using Starcounter.Startup.Routing;
+
+[Url("/DogsApp/Dogs/{?}")]
+public partial class DogViewModel: Json
+{
+    // ...
+}
+```
+
+Above code will expose your view-model under `/DogsApp/Dogs/{?}` to the browser, and `/DogsApp/partial/Dogs/{?}` to the Blending Engine. You won't be able to call the second URI from the browser.
+
+You can also expose your view-model to Blending or browser only.
+
+```c#
+// blending only
+[Url("/DogsApp/Dogs/{?}", AccessibleExternally = false)]
+
+// browser only
+[Url("/DogsApp/Dogs/{?}", Blendable = false)]
+```
+
 ### Registering view-models manually
 
 Sometimes you want to have more control over the registration of your handlers. You can achieve that with manual registration:
@@ -123,7 +149,8 @@ public void Configure(IApplicationBuilder applicationBuilder)
 }
 ```
 
-The snippet above will register a handler under "/DogsApp/partial/Dogs". This handler will return `DogViewModel`, but will only be available via `Self.Get`.
+The snippet above will register a handler under "/DogsApp/partial/Dogs". This handler will return `DogViewModel`, but will only be available to Blending engine.
+⚠️ This snippet is obsolete - it's easier to use `[Url("/DogsApp/Dogs", AccessibleExternally = false)]` to achieve the same effect.
 
 ### Handling URI parameters, working with Context
 

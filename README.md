@@ -15,6 +15,7 @@ Dependency injection for Starcounter 2.4
     + [Controlling transaction scopes in master page](#controlling-transaction-scopes-in-master-page)
 - [Dependency injection in view-models](#dependency-injection-in-view-models)
   * [Services registered by default](#services-registered-by-default)
+- [UriHelper](#urihelper)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
@@ -415,3 +416,32 @@ public partial class DogViewModel: Json, IInitPageWithDependencies
 
 `DefaultStarcounterBootstrapper` registers two aspnet.core's features by default - [logging](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-2.1) and [options](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-2.1&tabs=basicconfiguration). You can read about them on [docs.microsoft.com](https://docs.microsoft.com).
 All logs are printed on Standard Output by default.
+
+## UriHelper
+
+`UriHelper` is a collection of static methods which ease working with Starcounter URIs. It exposes following methods. Each method below is accompanied by an example with output.
+
+```c#
+public static string PartialToPage(string partialUri, string applicationName)
+```
+
+Converts partial URI to page URI. E.g. `PartialToPage("/MyApp/partial/dog", "MyApp")` will return `"/MyApp/dog"`.
+
+
+```c#
+public static string PageToPartial(string pageUri, string applicationName)
+```
+
+Converts page URI to partial URI. E.g. `PageToPartial("/MyApp/dog", "MyApp")` will return `"/MyApp/partial/dog"`.
+
+```c#
+public static bool IsPartialUri(string uri)
+```
+
+Returns true if the supplied URI is a partial URI. E.g. `IsPartialUri("/MyApp/partial/dog")` will return `true`, but `IsPartialUri("/MyApp/dog")` will return `false`.
+
+```c#
+public static string WithArguments(string uriTemplate, params string[] arguments)
+```
+
+Returns the supplied URI with its arguments filled. E.g. `WithArguments("/MyApp/partial/dog/{?}", "xyz")` will return `"/MyApp/partial/dog/xyz"`.

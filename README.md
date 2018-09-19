@@ -7,15 +7,17 @@ Dependency injection for Starcounter 2.4
 - [Getting started](#getting-started)
 - [Router](#router)
   * [Registering view-models with UrlAttribute](#registering-view-models-with-urlattribute)
+  * [Exposing view-models to blending and browser](#exposing-view-models-to-blending-and-browser)
   * [Registering view-models manually](#registering-view-models-manually)
   * [Handling URI parameters, working with Context](#handling-uri-parameters-working-with-context)
   * [Middleware](#middleware)
-  * [Recipe: MasterPage](#recipe-masterpage)
+  * [Blending, Db.Scope, MasterPage](#blending-dbscope-masterpage)
+    + [Controlling transaction scopes in master page](#controlling-transaction-scopes-in-master-page)
 - [Dependency injection in view-models](#dependency-injection-in-view-models)
   * [Services registered by default](#services-registered-by-default)
+- [UriHelper](#urihelper)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
-
 
 ## Installation
 
@@ -107,6 +109,32 @@ public void Configure(IApplicationBuilder applicationBuilder)
 
 The snippets above will register a handler under "/DogsApp/Dogs" and "/DogsApp/AllDogs". This handler will return `DogViewModel`.
 
+### Exposing view-models to blending and browser
+
+By default, applying `[UrlAttribute]` will expose your view-model to the browser (or anyone who uses HTTP) under the supplied URI, and to the Blending Engine under the partial URI.
+
+```c#
+// using Starcounter.Startup.Routing;
+
+[Url("/DogsApp/Dogs/{?}")]
+public partial class DogViewModel: Json
+{
+    // ...
+}
+```
+
+The code above will expose your view-model under `/DogsApp/Dogs/{?}` to the browser, and `/DogsApp/partial/Dogs/{?}` to the Blending Engine. You won't be able to call the second URI from the browser.
+
+You can also expose your view-model to Blending or browser only.
+
+```c#
+// blending only
+[Url("/DogsApp/Dogs/{?}", External = false)]
+
+// browser only
+[Url("/DogsApp/Dogs/{?}", Blendable = false)]
+```
+
 ### Registering view-models manually
 
 Sometimes you want to have more control over the registration of your handlers. You can achieve that with manual registration:
@@ -118,12 +146,12 @@ Sometimes you want to have more control over the registration of your handlers. 
 public void Configure(IApplicationBuilder applicationBuilder)
 {
     applicationBuilder.ApplicationServices.GetRouter()
-      .HandleGet<DogViewModel>("/DogsApp/partial/Dogs", new HandlerOptions {SelfOnly = true});
+      .HandleGet<DogViewModel>("/DogsApp/very-custom-uri/Dogs", new HandlerOptions {SelfOnly = true});
     // see also other overloads of HandleGet
 }
 ```
 
-The snippet above will register a handler under "/DogsApp/partial/Dogs". This handler will return `DogViewModel`, but will only be available via `Self.Get`.
+The snippet above will register a handler under "/DogsApp/very-custom-uri/Dogs". This handler will return `DogViewModel`, but will only be available to Blending engine.
 
 ### Handling URI parameters, working with Context
 
@@ -244,7 +272,7 @@ public void ConfigureServices(IServiceCollection services)
 
 The above snippet will register `LoggingMiddleware` to run at every request processed by the `Router`.
 
-`AddRouter` extension method mentioned before adds two pieces of middleware by default: `DbScopeMiddleware` and `ContextMiddleware`. If you want to prevent that behavior you can do that by passing `false` to `includeDefaultMiddleware` parameter:
+`AddRouter` extension method mentioned before adds two pieces of middleware by default: `MasterPageMiddleware` and `ContextMiddleware`. If you want to prevent that behavior you can do that by passing `false` to `includeDefaultMiddleware` parameter:
 
 ```c#
 // using Microsoft.Extensions.DependencyInjection;
@@ -255,44 +283,49 @@ public void ConfigureServices(IServiceCollection services)
 {
     services.AddRouter(false);
     // you can add them manually:
-    // services.AddDbScopeMiddleware();
+    // services.AddTransient<IPageMiddleware, MasterPageMiddleware>();
     // services.AddTransient<IPageMiddleware, ContextMiddleware>();
 }
 ```
 
-### Recipe: MasterPage
+### Blending, Db.Scope, MasterPage
 
-To wrap every page marked with a specific attribute in a common view-model, you can use the following code:
-```c#
-using System;
-using System.Reflection;
-using Starcounter;
-using Starcounter.Startup.Routing;
+By default, every view-model you register with `[Url]` is both page URI and partial URI registered. When you access its page URI, `Router` creates a `Db.Scope` and retrieves its blending URI. This means, that if you request your view-model in the browser, the response can contain other, blended view-models as well. `Router` makes sure that they all share a common transaction.
 
-[AttributeUsage(AttributeTargets.Class)]
-public sealed class WrapAttribute : Attribute {}
+A common application feature is to have some layout that wraps every response of an app and adds navigation features. This wrapping page would be called a master page. To enable it, create a view-model deriving from `MasterPageBase` and register it using `SetMasterPage<T>`:
 
-public class WrapperViewModel : Json
+```json
 {
-    public Json InnerViewModel { get; set; }
+  "Html": "/MyApplication/views/MasterNavigation.html",
+  "InnerJson": {}
 }
+```
 
-public class WrapperMiddleware : IPageMiddleware
+```c#
+using Starcounter;
+using Starcounter.Startup.Routing.Middleware;
+
+public partial class MasterNavigationPage : MasterPageBase
 {
-    public Response Run(RoutingInfo routingInfo, Func<Response> next)
+    public override void SetPartial(Json partial)
     {
-        var originalResponse = next();
-        if (routingInfo.SelectedPageType.GetCustomAttribute<WrapAttribute>() == null)
-        {
-            return originalResponse;
-        }
-
-        return new WrapperViewModel {InnerViewModel = originalResponse};
+        InnerJson = partial;
     }
 }
 ```
 
-Remember to register it:
+```html
+<template>
+    <dom-bind>
+        <template is="dom-bind">
+            <h1>Application-wide header</h1>
+            <a href="/MyApplication/Home">Go home</a>
+            <starcounter-include view-model="{{model.InnerJson}}"></starcounter-include>
+        </template>
+    </dom-bind>
+</template>
+```
+
 ```c#
 // using Microsoft.Extensions.DependencyInjection;
 // using Starcounter.Startup.Abstractions;
@@ -300,23 +333,54 @@ Remember to register it:
 
 public void ConfigureServices(IServiceCollection services)
 {
-    services.AddRouter();
-    services.AddTransient<IPageMiddleware, WrapperMiddleware>();
+    services
+        .AddRouter()
+        .SetMasterPage<MasterNavigationPage>();
+    
 }
 ```
 
-To use it, mark your view-models with your new attribute:
+
+#### Controlling transaction scopes in master page
+
+Without master page, all the blended view-models share a common transaction. With a master page like one defined above, all the blended view-models share a common transaction, but the master page itself has no transaction. You can change that if you want.
+
+To put the master page in a transaction, you have to create it in `Db.Scope`. To do it, register your custom master page factory:
+
+```c#
+// using Microsoft.Extensions.DependencyInjection;
+// using Starcounter.Startup.Abstractions;
+// using Starcounter.Startup.Routing;
+
+public void ConfigureServices(IServiceCollection services)
+{
+    services
+        .AddRouter()
+        .SetMasterPage((provider, routingInfo) => Db.Scope(() => new MasterNavigationPage()))
+}
+```
+
+The code above will create `MasterNavigationPage` in a transaction scope, but it will not be shared with the blended view-models. If you want it to be in shared transaction, you can change it by overriding `ExecuteInScope` in your master page:
+
 ```c#
 using Starcounter;
-using Starcounter.Startup.Routing;
+using Starcounter.Startup.Routing.Middleware;
 
-[Url("/DogsApp/Dogs")]
-[Wrap]
-public partial class DogsViewModel: Json
+public partial class MasterNavigationPage : MasterPageBase
 {
-  // ...
+    public override void SetPartial(Json partial)
+    {
+        InnerJson = partial;
+    }
+
+    public override Json ExecuteInScope(Func<Json> innerJsonFactory)
+    {
+        return AttachedScope.Scope(innerJsonFactory);
+    }
 }
 ```
+
+The code above will attach the blended view-models to the scope of the master page. That way all the view-models will share a transaction.
 
 ## Dependency injection in view-models
 
@@ -406,3 +470,32 @@ public partial class AllDogsViewModel: Json
 
 `DefaultStarcounterBootstrapper` registers two aspnet.core's features by default - [logging](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-2.1) and [options](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-2.1&tabs=basicconfiguration). You can read about them on [docs.microsoft.com](https://docs.microsoft.com).
 All logs are printed on Standard Output by default.
+
+## UriHelper
+
+`UriHelper` is a collection of static methods which ease working with Starcounter URIs. It exposes following methods. Each method below is accompanied by an example with output.
+
+```c#
+public static string PartialToPage(string partialUri)
+```
+
+Converts partial URI to page URI. E.g. `PartialToPage("/MyApp/partial/dog")` will return `"/MyApp/dog"`.
+
+
+```c#
+public static string PageToPartial(string pageUri)
+```
+
+Converts page URI to partial URI. E.g. `PageToPartial("/MyApp/dog")` will return `"/MyApp/partial/dog"`.
+
+```c#
+public static bool IsPartialUri(string uri)
+```
+
+Returns true if the supplied URI is a partial URI. E.g. `IsPartialUri("/MyApp/partial/dog")` will return `true`, but `IsPartialUri("/MyApp/dog")` will return `false`.
+
+```c#
+public static string WithArguments(string uriTemplate, params string[] arguments)
+```
+
+Returns the supplied URI with its arguments filled. E.g. `WithArguments("/MyApp/partial/dog/{?}", "xyz")` will return `"/MyApp/partial/dog/xyz"`.

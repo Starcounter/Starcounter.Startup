@@ -19,7 +19,7 @@ namespace Starcounter.Startup.Tests.Routing
 
             serviceCollection.AddRouter();
 
-            serviceCollection.BuildServiceProvider().GetService<Router>()
+            serviceCollection.BuildServiceProvider().GetService<IRouter>()
                 .Should().NotBeNull();
         }
 
@@ -34,7 +34,7 @@ namespace Starcounter.Startup.Tests.Routing
 
             serviceCollection.BuildServiceProvider().GetServices<IPageMiddleware>()
                 .Select(middleware => middleware.GetType())
-                .Should().ContainInOrder(typeof(DbScopeMiddleware), typeof(ContextMiddleware));
+                .Should().ContainInOrder(typeof(MasterPageMiddleware), typeof(ContextMiddleware));
         }
 
         [Test]
@@ -73,5 +73,6 @@ namespace Starcounter.Startup.Tests.Routing
             serviceCollection.BuildServiceProvider().GetServices<IPageMiddleware>()
                 .Should().HaveCount(1);
         }
+
     }
 }

@@ -168,4 +168,7 @@
   <data name="Router_RegisteringUri" xml:space="preserve">
     <value>Registering URI '{0}' with type '{1}'</value>
   </data>
+  <data name="UriHelper_CantFillUriTemplateSlotCountMismatch" xml:space="preserve">
+    <value>Can't fill URI template '{0}' with arguments: provided URI template has {1} slots, but {2} argument(s) were provided. Arguments values: {3}</value>
+  </data>
 </root>

@@ -8,28 +8,30 @@ namespace Starcounter.Startup.Routing.Middleware
     /// </summary>
     public class MasterPageMiddleware: IPageMiddleware
     {
-        private readonly IPartialUriHelper _partialUriHelper;
         private readonly Func<MasterPageBase> _masterPageFactory;
+        private readonly IApplicationNameProvider _applicationNameProvider;
 
-        public MasterPageMiddleware(IPartialUriHelper partialUriHelper, Func<MasterPageBase> masterPageFactory = null)
+        public MasterPageMiddleware(IApplicationNameProvider applicationNameProvider,
+            Func<MasterPageBase> masterPageFactory = null)
         {
-            _partialUriHelper = partialUriHelper ?? throw new ArgumentNullException(nameof(partialUriHelper));
             _masterPageFactory = masterPageFactory;
+            _applicationNameProvider = applicationNameProvider;
         }
 
         public Response Run(RoutingInfo routingInfo, Func<Response> next)
         {
-            if (_partialUriHelper.IsPartialUri(routingInfo.Request.Uri))
+            if (UriHelper.IsPartialUri(routingInfo.Request.Uri))
             {
                 return next();
             }
 
-            Json CreateBlendedResponse() => Self.GET( // enable blending
-                _partialUriHelper.PageToPartial(routingInfo.Request.Uri));
+            Json CreateBlendedResponse() => Self.GET(UriHelper.PageToPartial(
+                routingInfo.Request.Uri,
+                _applicationNameProvider.CurrentApplicationName));
 
             if (_masterPageFactory == null)
             {
-                return Db.Scope(CreateBlendedResponse); // put all the blended view-models in a common scope
+                return Db.Scope(CreateBlendedResponse);
             }
 
             var masterPage = _masterPageFactory();

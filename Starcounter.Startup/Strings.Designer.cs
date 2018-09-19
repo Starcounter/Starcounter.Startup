@@ -212,5 +212,14 @@ namespace Starcounter.Startup {
                 return ResourceManager.GetString("Router_TypeHasNoUrlAttribute", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t fill URI template &apos;{0}&apos; with arguments: provided URI template has {1} slots, but {2} argument(s) were provided. Arguments values: {3}.
+        /// </summary>
+        internal static string UriHelper_CantFillUriTemplateSlotCountMismatch {
+            get {
+                return ResourceManager.GetString("UriHelper_CantFillUriTemplateSlotCountMismatch", resourceCulture);
+            }
+        }
     }
 }

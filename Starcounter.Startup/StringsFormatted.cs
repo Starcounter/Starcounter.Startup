@@ -25,43 +25,46 @@ namespace Starcounter.Startup
                 String.Join(", ", methodsWithAttribute));
 
         public static string ReflectionHelper_InvalidApplicationOfAttribute(Type attribute, Type inspectedType, string details) =>
-            string.Format(Strings.ReflectionHelper_InvalidApplicationOfAttribute, attribute, inspectedType, details);
+            String.Format(Strings.ReflectionHelper_InvalidApplicationOfAttribute, attribute, inspectedType, details);
 
         public static string ReflectionHelper_MethodShouldAcceptOneParameter(Type attribute, Type expectedParameterType, MethodInfo methodWithAttribute) =>
-            string.Format(
+            String.Format(
                 Strings.ReflectionHelper_MethodShouldAcceptOneParameter,
                 attribute.Name, expectedParameterType.Name, methodWithAttribute);
 
         public static string ReflectionHelper_WrongReturnType(Type attribute, Type expectedReturnType, MethodInfo methodWithAttribute) =>
-            string.Format(Strings.ReflectionHelper_WrongReturnType,
+            String.Format(Strings.ReflectionHelper_WrongReturnType,
                 attribute.Name, expectedReturnType.Name, methodWithAttribute);
 
         public static string ReflectionHelper_MethodNotStatic(Type attribute, MethodInfo methodWithAttribute) =>
-            string.Format(Strings.ReflectionHelper_MethodNotStatic,
+            String.Format(Strings.ReflectionHelper_MethodNotStatic,
                 attribute.Name, methodWithAttribute);
 
         public static string ReflectionHelper_MethodNotPublic(Type attribute, MethodInfo methodWithAttribute) =>
-            string.Format(Strings.ReflectionHelper_MethodNotPublic,
+            String.Format(Strings.ReflectionHelper_MethodNotPublic,
                 attribute.Name, methodWithAttribute);
 
         public static string ContextMiddleware_CouldNotCreateContext(Type contextType, Type viewModelType, string details) =>
-            string.Format(Strings.ContextMiddleware_CouldNotCreateContext, contextType, viewModelType, details);
+            String.Format(Strings.ContextMiddleware_CouldNotCreateContext, contextType, viewModelType, details);
 
         public static string ContextMiddleware_ContextIsDbSoUriShouldHaveOneArgument(Type contextType) =>
-            string.Format(Strings.ContextMiddleware_ContextIsDbSoUriShouldHaveOneArgument, contextType, nameof(UriToContextAttribute));
+            String.Format(Strings.ContextMiddleware_ContextIsDbSoUriShouldHaveOneArgument, contextType, nameof(UriToContextAttribute));
 
         public static string ContextMiddleware_MarkViewModelAsIBoundOrUriToContext(Type contextType) =>
-            string.Format(Strings.ContextMiddleware_MarkViewModelAsIBoundOrUriToContext, contextType, nameof(UriToContextAttribute));
+            String.Format(Strings.ContextMiddleware_MarkViewModelAsIBoundOrUriToContext, contextType, nameof(UriToContextAttribute));
 
         public static string ContextMiddleware_CouldNotResolveUriToContextDependencies(MethodInfo uriToContext) =>
-            string.Format(Strings.ContextMiddleware_CouldNotResolveUriToContextDependencies, uriToContext);
+            String.Format(Strings.ContextMiddleware_CouldNotResolveUriToContextDependencies, uriToContext);
 
         public static string MasterPageMiddleware_MasterPageIsNull() => Strings.MasterPageMiddleware_MasterPageIsNull;
 
         public static string Router_TypeHasNoUrlAttribute(Type type) =>
-            string.Format(Strings.Router_TypeHasNoUrlAttribute, type, typeof(UrlAttribute));
+            String.Format(Strings.Router_TypeHasNoUrlAttribute, type, typeof(UrlAttribute));
 
         public static string Router_RegisteringUri(string uri, Type type) =>
-            string.Format(Strings.Router_RegisteringUri, uri, type);
+            String.Format(Strings.Router_RegisteringUri, uri, type);
+
+        public static string UriHelper_CantFillUriTemplateSlotCountMismatch(string uriTemplate, string[] arguments, int slotsCount) =>
+            String.Format(Strings.UriHelper_CantFillUriTemplateSlotCountMismatch, uriTemplate, slotsCount, arguments.Length, string.Join(",", arguments));
     }
 }

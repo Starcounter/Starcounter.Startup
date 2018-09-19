@@ -307,9 +307,9 @@ using Starcounter.Startup.Routing.Middleware;
 
 public partial class MasterNavigationPage : MasterPageBase
 {
-    public override void SetBlended(Json blended)
+    public override void SetPartial(Json partial)
     {
-        InnerJson = blended;
+        InnerJson = partial;
     }
 }
 ```
@@ -356,7 +356,7 @@ public void ConfigureServices(IServiceCollection services)
 {
     services
         .AddRouter()
-        .SetMasterPage(provider => Db.Scope(() => new MasterNavigationPage()))
+        .SetMasterPage((provider, routingInfo) => Db.Scope(() => new MasterNavigationPage()))
 }
 ```
 
@@ -368,9 +368,9 @@ using Starcounter.Startup.Routing.Middleware;
 
 public partial class MasterNavigationPage : MasterPageBase
 {
-    public override void SetBlended(Json blended)
+    public override void SetPartial(Json partial)
     {
-        InnerJson = blended;
+        InnerJson = partial;
     }
 
     public override Json ExecuteInScope(Func<Json> innerJsonFactory)

@@ -8,9 +8,9 @@ namespace Starcounter.Startup.Routing.Middleware
     /// </summary>
     public class MasterPageMiddleware: IPageMiddleware
     {
-        private readonly Func<MasterPageBase> _masterPageFactory;
+        private readonly Func<RoutingInfo, MasterPageBase> _masterPageFactory;
 
-        public MasterPageMiddleware(Func<MasterPageBase> masterPageFactory = null)
+        public MasterPageMiddleware(Func<RoutingInfo, MasterPageBase> masterPageFactory = null)
         {
             _masterPageFactory = masterPageFactory;
         }
@@ -29,7 +29,7 @@ namespace Starcounter.Startup.Routing.Middleware
                 return Db.Scope(CreateBlendedResponse);
             }
 
-            var masterPage = _masterPageFactory();
+            var masterPage = _masterPageFactory(routingInfo);
             if (masterPage == null)
             {
                 throw new InvalidOperationException(StringsFormatted.MasterPageMiddleware_MasterPageIsNull());

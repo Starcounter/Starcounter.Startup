@@ -55,9 +55,9 @@ namespace Starcounter.Startup.Routing
         /// <param name="services">The service collection to register in.</param>
         /// <param name="masterPageFactory">The factory for master page.</param>
         /// <returns>The original service collection.</returns>
-        public static IServiceCollection SetMasterPage(this IServiceCollection services, Func<IServiceProvider, MasterPageBase> masterPageFactory)
+        public static IServiceCollection SetMasterPage(this IServiceCollection services, Func<IServiceProvider, RoutingInfo, MasterPageBase> masterPageFactory)
         {
-            services.AddSingleton<Func<MasterPageBase>>(provider => () => masterPageFactory(provider));
+            services.AddSingleton<Func<RoutingInfo, MasterPageBase>>(provider => routingInfo => masterPageFactory(provider, routingInfo));
             return services;
         }
 

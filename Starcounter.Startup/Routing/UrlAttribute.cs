@@ -24,7 +24,7 @@ namespace Starcounter.Startup.Routing
         /// <summary>
         /// If set to false, then the page URI will not be accessible from a browser. Defaults to true.
         /// </summary>
-        public bool AccessibleExternally { get; set; } = true;
+        public bool External { get; set; } = true;
 
         public UrlAttribute(string value)
         {

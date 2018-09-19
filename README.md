@@ -129,7 +129,7 @@ You can also expose your view-model to Blending or browser only.
 
 ```c#
 // blending only
-[Url("/DogsApp/Dogs/{?}", AccessibleExternally = false)]
+[Url("/DogsApp/Dogs/{?}", External = false)]
 
 // browser only
 [Url("/DogsApp/Dogs/{?}", Blendable = false)]

@@ -36,7 +36,7 @@ namespace Starcounter.Startup.Routing
             foreach (var urlAttribute in urlAttributes)
             {
                 var pageUri = urlAttribute.Value;
-                if (urlAttribute.AccessibleExternally)
+                if (urlAttribute.External)
                 {
                     HandleGet(pageUri, pageType, handlerOptions);
                 }

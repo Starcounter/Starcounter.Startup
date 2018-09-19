@@ -13,17 +13,14 @@ namespace Starcounter.Startup.Routing
     {
         private readonly IPageCreator _pageCreator;
         private readonly ILogger<Router> _logger;
-        private readonly IApplicationNameProvider _applicationNameProvider;
         private readonly List<IPageMiddleware> _middleware;
 
         public Router(IPageCreator pageCreator,
             IEnumerable<IPageMiddleware> middlewares,
-            ILogger<Router> logger,
-            IApplicationNameProvider applicationNameProvider)
+            ILogger<Router> logger)
         {
             _pageCreator = pageCreator;
             _logger = logger;
-            _applicationNameProvider = applicationNameProvider;
             _middleware = middlewares.ToList();
         }
 
@@ -45,7 +42,7 @@ namespace Starcounter.Startup.Routing
                 }
                 if (urlAttribute.Blendable)
                 {
-                    HandleGet(UriHelper.PageToPartial(pageUri,_applicationNameProvider.CurrentApplicationName),
+                    HandleGet(UriHelper.PageToPartial(pageUri),
                         pageType,
                         SelfOnlyHandlerOptions(handlerOptions));
                 }

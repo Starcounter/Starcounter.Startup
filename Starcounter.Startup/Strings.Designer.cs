@@ -221,5 +221,14 @@ namespace Starcounter.Startup {
                 return ResourceManager.GetString("UriHelper_CantFillUriTemplateSlotCountMismatch", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to URI &apos;{0}&apos; is malformed: URI should start with a &apos;/&apos;.
+        /// </summary>
+        internal static string UriHelper_MalformedUri {
+            get {
+                return ResourceManager.GetString("UriHelper_MalformedUri", resourceCulture);
+            }
+        }
     }
 }

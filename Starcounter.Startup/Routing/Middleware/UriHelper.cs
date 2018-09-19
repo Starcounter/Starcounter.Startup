@@ -13,10 +13,16 @@ namespace Starcounter.Startup.Routing.Middleware
         /// Converts partial URI to page URI.
         /// </summary>
         /// <param name="partialUri">The partial version of URI, as accessible to the blending engine.</param>
-        /// <param name="applicationName">The name of currently executing Starcounter application.</param>
         /// <returns>The page version of URI, as accessible by browser.</returns>
-        public static string PartialToPage(string partialUri, string applicationName)
+        public static string PartialToPage(string partialUri)
         {
+            if (partialUri == null) throw new ArgumentNullException(nameof(partialUri));
+            if (partialUri[0] != '/')
+            {
+                throw new ArgumentException(StringsFormatted.UriHelper_MalformedUri(partialUri), nameof(partialUri));
+            }
+
+            var applicationName = ExtractApplicationName(partialUri);
             return "/" + applicationName + partialUri.Substring(applicationName.Length + 1 + PartialPart.Length);
         }
 
@@ -24,10 +30,16 @@ namespace Starcounter.Startup.Routing.Middleware
         /// Converts page URI to partial URI.
         /// </summary>
         /// <param name="pageUri">The page version of URI, as accessible by browser.</param>
-        /// <param name="applicationName">The name of currently executing Starcounter application.</param>
         /// <returns>The partial version of URI, as accessible to the blending engine.</returns>
-        public static string PageToPartial(string pageUri, string applicationName)
+        public static string PageToPartial(string pageUri)
         {
+            if (pageUri == null) throw new ArgumentNullException(nameof(pageUri));
+            if (pageUri[0] != '/')
+            {
+                throw new ArgumentException(StringsFormatted.UriHelper_MalformedUri(pageUri), nameof(pageUri));
+            }
+
+            var applicationName = ExtractApplicationName(pageUri);
             return "/" + applicationName + PartialPart + pageUri.Substring(applicationName.Length + 1);
         }
 
@@ -71,6 +83,13 @@ namespace Starcounter.Startup.Routing.Middleware
             }
 
             return uriTemplate;
+        }
+
+        private static string ExtractApplicationName(string partialUri)
+        {
+            var indexOfSlash = partialUri.IndexOf("/", 1, StringComparison.Ordinal);
+            var applicationName = partialUri.Substring(1, indexOfSlash - 1);
+            return applicationName;
         }
     }
 }

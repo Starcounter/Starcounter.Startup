@@ -421,17 +421,17 @@ All logs are printed on Standard Output by default.
 `UriHelper` is a collection of static methods which ease working with Starcounter URIs. It exposes following methods. Each method below is accompanied by an example with output.
 
 ```c#
-public static string PartialToPage(string partialUri, string applicationName)
+public static string PartialToPage(string partialUri)
 ```
 
-Converts partial URI to page URI. E.g. `PartialToPage("/MyApp/partial/dog", "MyApp")` will return `"/MyApp/dog"`.
+Converts partial URI to page URI. E.g. `PartialToPage("/MyApp/partial/dog")` will return `"/MyApp/dog"`.
 
 
 ```c#
-public static string PageToPartial(string pageUri, string applicationName)
+public static string PageToPartial(string pageUri)
 ```
 
-Converts page URI to partial URI. E.g. `PageToPartial("/MyApp/dog", "MyApp")` will return `"/MyApp/partial/dog"`.
+Converts page URI to partial URI. E.g. `PageToPartial("/MyApp/dog")` will return `"/MyApp/partial/dog"`.
 
 ```c#
 public static bool IsPartialUri(string uri)

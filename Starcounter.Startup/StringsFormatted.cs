@@ -65,6 +65,8 @@ namespace Starcounter.Startup
             String.Format(Strings.Router_RegisteringUri, uri, type);
 
         public static string UriHelper_CantFillUriTemplateSlotCountMismatch(string uriTemplate, string[] arguments, int slotsCount) =>
-            String.Format(Strings.UriHelper_CantFillUriTemplateSlotCountMismatch, uriTemplate, slotsCount, arguments.Length, string.Join(",", arguments));
+            String.Format(Strings.UriHelper_CantFillUriTemplateSlotCountMismatch, uriTemplate, slotsCount, arguments.Length, String.Join(",", arguments));
+
+        public static string UriHelper_MalformedUri(string pageUri) => String.Format(Strings.UriHelper_MalformedUri, pageUri);
     }
 }

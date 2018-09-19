@@ -12,7 +12,6 @@ namespace Starcounter.Startup.Routing
         {
             services.TryAddSingleton<IPageCreator, DefaultPageCreator>();
             services.TryAddTransient<IRouter, Router>();
-            services.TryAddTransient<IApplicationNameProvider, ApplicationNameProvider>();
 
             if (addDefaultMiddleware)
             {

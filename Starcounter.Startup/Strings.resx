@@ -171,4 +171,7 @@
   <data name="UriHelper_CantFillUriTemplateSlotCountMismatch" xml:space="preserve">
     <value>Can't fill URI template '{0}' with arguments: provided URI template has {1} slots, but {2} argument(s) were provided. Arguments values: {3}</value>
   </data>
+  <data name="UriHelper_MalformedUri" xml:space="preserve">
+    <value>URI '{0}' is malformed: URI should start with a '/'</value>
+  </data>
 </root>

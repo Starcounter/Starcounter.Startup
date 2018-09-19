@@ -9,13 +9,10 @@ namespace Starcounter.Startup.Routing.Middleware
     public class MasterPageMiddleware: IPageMiddleware
     {
         private readonly Func<MasterPageBase> _masterPageFactory;
-        private readonly IApplicationNameProvider _applicationNameProvider;
 
-        public MasterPageMiddleware(IApplicationNameProvider applicationNameProvider,
-            Func<MasterPageBase> masterPageFactory = null)
+        public MasterPageMiddleware(Func<MasterPageBase> masterPageFactory = null)
         {
             _masterPageFactory = masterPageFactory;
-            _applicationNameProvider = applicationNameProvider;
         }
 
         public Response Run(RoutingInfo routingInfo, Func<Response> next)
@@ -25,9 +22,7 @@ namespace Starcounter.Startup.Routing.Middleware
                 return next();
             }
 
-            Json CreateBlendedResponse() => Self.GET(UriHelper.PageToPartial(
-                routingInfo.Request.Uri,
-                _applicationNameProvider.CurrentApplicationName));
+            Json CreateBlendedResponse() => Self.GET(UriHelper.PageToPartial(routingInfo.Request.Uri));
 
             if (_masterPageFactory == null)
             {

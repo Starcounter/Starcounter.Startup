@@ -13,8 +13,9 @@ namespace Starcounter.Startup.Tests.Routing.Middleware
         [TestCase("/app/partial/dogs/1/tail", "/app/dogs/1/tail")]
         public void TestPartialToPage(string inputPartialUri, string expectedOutput)
         {
-            UriHelper.PartialToPage(inputPartialUri, "app")
-                .Should().Be(expectedOutput);
+            UriHelper.PartialToPage(inputPartialUri)
+                // BeEquivalentTo is case-insensitive
+                .Should().BeEquivalentTo(expectedOutput);
         }
 
         [TestCase("/app/dogs", "/app/partial/dogs")]
@@ -23,8 +24,9 @@ namespace Starcounter.Startup.Tests.Routing.Middleware
         [TestCase("/app/dogs/1/tail", "/app/partial/dogs/1/tail")]
         public void TestPageToPartial(string inputPageUri, string expectedOutput)
         {
-            UriHelper.PageToPartial(inputPageUri, "app")
-                .Should().Be(expectedOutput);
+            UriHelper.PageToPartial(inputPageUri)
+                // BeEquivalentTo is case-insensitive
+                .Should().BeEquivalentTo(expectedOutput);
         }
 
         [TestCase("/app/dogs", false)]

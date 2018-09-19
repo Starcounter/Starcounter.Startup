@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Starcounter.Startup.Routing
+﻿namespace Starcounter.Startup.Routing
 {
     /// <summary>
     /// Use to specify the Context type for page class.

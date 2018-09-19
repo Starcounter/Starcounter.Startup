@@ -1,5 +1,4 @@
 ﻿using System;
-using Starcounter.XSON;
 
 namespace Starcounter.Startup.Routing.Middleware
 {

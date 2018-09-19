@@ -146,13 +146,12 @@ Sometimes you want to have more control over the registration of your handlers. 
 public void Configure(IApplicationBuilder applicationBuilder)
 {
     applicationBuilder.ApplicationServices.GetRouter()
-      .HandleGet<DogViewModel>("/DogsApp/partial/Dogs", new HandlerOptions {SelfOnly = true});
+      .HandleGet<DogViewModel>("/DogsApp/very-custom-uri/Dogs", new HandlerOptions {SelfOnly = true});
     // see also other overloads of HandleGet
 }
 ```
 
-The snippet above will register a handler under "/DogsApp/partial/Dogs". This handler will return `DogViewModel`, but will only be available to Blending engine.
-⚠️ This snippet is obsolete - it's easier to use `[Url("/DogsApp/Dogs", AccessibleExternally = false)]` to achieve the same effect.
+The snippet above will register a handler under "/DogsApp/very-custom-uri/Dogs". This handler will return `DogViewModel`, but will only be available to Blending engine.
 
 ### Handling URI parameters, working with Context
 
@@ -361,7 +360,7 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-The code above will create `MasterNavigationPage` in a transaction scope, but it will not be shared with the blended view-models. Sometimes that's what you want. If not, you can change it by overriding `ExecuteInScope` in your master page:
+The code above will create `MasterNavigationPage` in a transaction scope, but it will not be shared with the blended view-models. If you want it to be in shared transaction, you can change it by overriding `ExecuteInScope` in your master page:
 
 ```c#
 using Starcounter;

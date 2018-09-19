@@ -41,7 +41,7 @@ namespace Starcounter.Startup.Routing.Middleware
             }
 
             var scopedBlendedJson = masterPage.ExecuteInScope(CreateBlendedResponse);
-            masterPage.SetBlended(scopedBlendedJson);
+            masterPage.SetPartial(scopedBlendedJson);
 
             return masterPage;
         }

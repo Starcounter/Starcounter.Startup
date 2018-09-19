@@ -1,4 +1,5 @@
 ﻿using System;
+using Starcounter.XSON;
 
 namespace Starcounter.Startup.Routing.Middleware
 {
@@ -13,16 +14,16 @@ namespace Starcounter.Startup.Routing.Middleware
         /// Override this method to control the Db.Scope in which
         /// the view-models will be created.
         /// </summary>
-        /// <param name="innerJsonFactory">Creates the blended view-models using Self.GET. This should be executed either in <see cref="Db.Scope"/> or <see cref="IScopeContext.Scope"/></param>
-        public virtual Json ExecuteInScope(Func<Json> innerJsonFactory)
+        /// <param name="partialViewModelFactory">Creates the partial view-model using Self.GET. This should be executed either in <see cref="Db.Scope"/> or <see cref="IScopeContext.Scope"/></param>
+        public virtual Json ExecuteInScope(Func<Json> partialViewModelFactory)
         {
-            return Db.Scope(innerJsonFactory);
+            return Db.Scope(partialViewModelFactory);
         }
 
         /// <summary>
-        /// Override this method to assign the blended view-model to an exposed json property.
+        /// Override this method to assign the partial view-model to an exposed json property.
         /// </summary>
-        /// <param name="blended">The blended view-model that should be exposed.</param>
-        public abstract void SetBlended(Json blended);
+        /// <param name="partial">The partial view-model that should be exposed.</param>
+        public abstract void SetPartial(Json partial);
     }
 }

@@ -37,7 +37,7 @@ namespace Starcounter.Startup.Tests.Routing
 
             serviceCollection.BuildServiceProvider().GetServices<IPageMiddleware>()
                 .Select(middleware => middleware.GetType())
-                .Should().ContainInOrder(typeof(DbScopeMiddleware), typeof(ContextMiddleware));
+                .Should().ContainInOrder(typeof(MasterPageMiddleware), typeof(ContextMiddleware));
         }
 
         [Test]

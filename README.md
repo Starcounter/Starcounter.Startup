@@ -7,15 +7,16 @@ Dependency injection for Starcounter 2.4
 - [Getting started](#getting-started)
 - [Router](#router)
   * [Registering view-models with UrlAttribute](#registering-view-models-with-urlattribute)
+  * [Exposing view-models to blending and browser](#exposing-view-models-to-blending-and-browser)
   * [Registering view-models manually](#registering-view-models-manually)
   * [Handling URI parameters, working with Context](#handling-uri-parameters-working-with-context)
   * [Middleware](#middleware)
-  * [Recipe: MasterPage](#recipe-masterpage)
+  * [Blending, Db.Scope, MasterPage](#blending-dbscope-masterpage)
+    + [Controlling transaction scopes in master page](#controlling-transaction-scopes-in-master-page)
 - [Dependency injection in view-models](#dependency-injection-in-view-models)
   * [Services registered by default](#services-registered-by-default)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
-
 
 ## Installation
 
@@ -121,7 +122,7 @@ public partial class DogViewModel: Json
 }
 ```
 
-Above code will expose your view-model under `/DogsApp/Dogs/{?}` to the browser, and `/DogsApp/partial/Dogs/{?}` to the Blending Engine. You won't be able to call the second URI from the browser.
+The code above will expose your view-model under `/DogsApp/Dogs/{?}` to the browser, and `/DogsApp/partial/Dogs/{?}` to the Blending Engine. You won't be able to call the second URI from the browser.
 
 You can also expose your view-model to Blending or browser only.
 
@@ -271,7 +272,7 @@ public void ConfigureServices(IServiceCollection services)
 
 The above snippet will register `LoggingMiddleware` to run at every request processed by the `Router`.
 
-`AddRouter` extension method mentioned before adds two pieces of middleware by default: `DbScopeMiddleware` and `ContextMiddleware`. If you want to prevent that behavior you can do that by passing `false` to `includeDefaultMiddleware` parameter:
+`AddRouter` extension method mentioned before adds two pieces of middleware by default: `MasterPageMiddleware` and `ContextMiddleware`. If you want to prevent that behavior you can do that by passing `false` to `includeDefaultMiddleware` parameter:
 
 ```c#
 // using Microsoft.Extensions.DependencyInjection;
@@ -282,44 +283,49 @@ public void ConfigureServices(IServiceCollection services)
 {
     services.AddRouter(false);
     // you can add them manually:
-    // services.AddDbScopeMiddleware();
+    // services.AddTransient<IPageMiddleware, MasterPageMiddleware>();
     // services.AddTransient<IPageMiddleware, ContextMiddleware>();
 }
 ```
 
-### Recipe: MasterPage
+### Blending, Db.Scope, MasterPage
 
-To wrap every page marked with a specific attribute in a common view-model, you can use the following code:
-```c#
-using System;
-using System.Reflection;
-using Starcounter;
-using Starcounter.Startup.Routing;
+By default, every view-model you register with `[Url]` is both page URI and partial URI registered. When you access its page URI, `Router` creates a `Db.Scope` and retrieves its blending URI. This means, that if you request your view-model in the browser, the response can contain other, blended view-models as well. `Router` makes sure that they all share a common transaction.
 
-[AttributeUsage(AttributeTargets.Class)]
-public sealed class WrapAttribute : Attribute {}
+A common application feature is to have some layout that wraps every response of an app and adds navigation features. This wrapping page would be called a master page. To enable it, create a view-model deriving from `MasterPageBase` and register it using `SetMasterPage<T>`:
 
-public class WrapperViewModel : Json
+```json
 {
-    public Json InnerViewModel { get; set; }
+  "Html": "/MyApplication/views/MasterNavigation.html",
+  "InnerJson": {}
 }
+```
 
-public class WrapperMiddleware : IPageMiddleware
+```c#
+using Starcounter;
+using Starcounter.Startup.Routing.Middleware;
+
+public partial class MasterNavigationPage : MasterPageBase
 {
-    public Response Run(RoutingInfo routingInfo, Func<Response> next)
+    public override void SetBlended(Json blended)
     {
-        var originalResponse = next();
-        if (routingInfo.SelectedPageType.GetCustomAttribute<WrapAttribute>() == null)
-        {
-            return originalResponse;
-        }
-
-        return new WrapperViewModel {InnerViewModel = originalResponse};
+        InnerJson = blended;
     }
 }
 ```
 
-Remember to register it:
+```html
+<template>
+    <dom-bind>
+        <template is="dom-bind">
+            <h1>Application-wide header</h1>
+            <a href="/MyApplication/Home">Go home</a>
+            <starcounter-include view-model="{{model.InnerJson}}"></starcounter-include>
+        </template>
+    </dom-bind>
+</template>
+```
+
 ```c#
 // using Microsoft.Extensions.DependencyInjection;
 // using Starcounter.Startup.Abstractions;
@@ -327,23 +333,54 @@ Remember to register it:
 
 public void ConfigureServices(IServiceCollection services)
 {
-    services.AddRouter();
-    services.AddTransient<IPageMiddleware, WrapperMiddleware>();
+    services
+        .AddRouter()
+        .SetMasterPage<MasterNavigationPage>();
+    
 }
 ```
 
-To use it, mark your view-models with your new attribute:
+
+#### Controlling transaction scopes in master page
+
+Without master page, all the blended view-models share a common transaction. With a master page like one defined above, all the blended view-models share a common transaction, but the master page itself has no transaction. You can change that if you want.
+
+To put the master page in a transaction, you have to create it in `Db.Scope`. To do it, register your custom master page factory:
+
+```c#
+// using Microsoft.Extensions.DependencyInjection;
+// using Starcounter.Startup.Abstractions;
+// using Starcounter.Startup.Routing;
+
+public void ConfigureServices(IServiceCollection services)
+{
+    services
+        .AddRouter()
+        .SetMasterPage(provider => Db.Scope(() => new MasterNavigationPage()))
+}
+```
+
+The code above will create `MasterNavigationPage` in a transaction scope, but it will not be shared with the blended view-models. Sometimes that's what you want. If not, you can change it by overriding `ExecuteInScope` in your master page:
+
 ```c#
 using Starcounter;
-using Starcounter.Startup.Routing;
+using Starcounter.Startup.Routing.Middleware;
 
-[Url("/DogsApp/Dogs")]
-[Wrap]
-public partial class DogsViewModel: Json
+public partial class MasterNavigationPage : MasterPageBase
 {
-  // ...
+    public override void SetBlended(Json blended)
+    {
+        InnerJson = blended;
+    }
+
+    public override Json ExecuteInScope(Func<Json> innerJsonFactory)
+    {
+        return AttachedScope.Scope(innerJsonFactory);
+    }
 }
 ```
+
+The code above will attach the blended view-models to the scope of the master page. That way all the view-models will share a transaction.
 
 ## Dependency injection in view-models
 

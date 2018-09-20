@@ -8,16 +8,14 @@
     <OutputPath>bin\$(Configuration)</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <TargetFramework>net462</TargetFramework>
-    <Version>0.6.0</Version>
+    <Version>0.6.1</Version>
     <Authors>Starcounter, joozek78</Authors>
     <PackageProjectUrl>https://github.com/Starcounter/Starcounter.Startup</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Starcounter/Starcounter.Startup</RepositoryUrl>
     <PackageLicenseUrl>https://github.com/Starcounter/Starcounter.Startup/blob/master/LICENSE</PackageLicenseUrl>
     <Description>Bootstrapping library for Starcounter applications. Highly recommended for new 2.4 projects</Description>
     <PackageReleaseNotes>
-      * Introducing new default middleware - MasterPageMiddleware
-      * DbScopeMiddleware is now obsolete
-      * Extracted Router class into IRouter interface and RouterExtensions
+      * Fixed a bug where registering a view-model with root URI ("/MyApp") threw an exception
     </PackageReleaseNotes>
     <PackageTags>Starcounter</PackageTags>
   </PropertyGroup>

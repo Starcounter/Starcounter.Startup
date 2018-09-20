@@ -44,7 +44,7 @@ namespace Starcounter.Startup.Routing
         public static IServiceCollection SetMasterPage<T>(this IServiceCollection services)
             where T : MasterPageBase
         {
-            services.AddSingleton<Func<MasterPageBase>>(provider => () => ActivatorUtilities.CreateInstance<T>(provider));
+            services.AddSingleton<Func<RoutingInfo, MasterPageBase>>(provider => (_) => ActivatorUtilities.CreateInstance<T>(provider));
             return services;
         }
 

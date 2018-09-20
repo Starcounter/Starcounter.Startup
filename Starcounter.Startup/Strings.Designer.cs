@@ -214,6 +214,24 @@ namespace Starcounter.Startup {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to View-model {0} is registered with malformed URI: &apos;{1}&apos;. URI has to start with a slash sign (&apos;/&apos;).
+        /// </summary>
+        internal static string Router_ViewModelRegisteredWithMalformedUri {
+            get {
+                return ResourceManager.GetString("Router_ViewModelRegisteredWithMalformedUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View-model {0} is registered with partial URI: &apos;{1}&apos;. Use &apos;{2}&apos; instead.
+        /// </summary>
+        internal static string Router_ViewModelRegisteredWithPartialUri {
+            get {
+                return ResourceManager.GetString("Router_ViewModelRegisteredWithPartialUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can&apos;t fill URI template &apos;{0}&apos; with arguments: provided URI template has {1} slots, but {2} argument(s) were provided. Arguments values: {3}.
         /// </summary>
         internal static string UriHelper_CantFillUriTemplateSlotCountMismatch {

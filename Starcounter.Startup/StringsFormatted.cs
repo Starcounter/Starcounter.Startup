@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Starcounter.Startup.Routing;
 using Starcounter.Startup.Routing.Activation;
+using Starcounter.Startup.Routing.Middleware;
 
 namespace Starcounter.Startup
 {
@@ -68,5 +69,11 @@ namespace Starcounter.Startup
             String.Format(Strings.UriHelper_CantFillUriTemplateSlotCountMismatch, uriTemplate, slotsCount, arguments.Length, String.Join(",", arguments));
 
         public static string UriHelper_MalformedUri(string pageUri) => String.Format(Strings.UriHelper_MalformedUri, pageUri);
+
+        public static string Router_ViewModelRegisteredWithMalformedUri(Type pageType, string pageUri) => 
+            String.Format(Strings.Router_ViewModelRegisteredWithMalformedUri, pageType, pageUri);
+
+        public static string Router_ViewModelRegisteredWithPartialUri(Type pageType, string pageUri) => 
+            String.Format(Strings.Router_ViewModelRegisteredWithPartialUri, pageType, pageUri, UriHelper.PartialToPage(pageUri));
     }
 }

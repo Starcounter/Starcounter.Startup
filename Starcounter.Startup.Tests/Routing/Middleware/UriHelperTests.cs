@@ -1,12 +1,17 @@
 ﻿using System;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using NUnit.Framework;
+using Starcounter.Startup.Routing;
+using Starcounter.Startup.Routing.Activation;
 using Starcounter.Startup.Routing.Middleware;
 
 namespace Starcounter.Startup.Tests.Routing.Middleware
 {
     public class UriHelperTests
     {
+        [TestCase("/app/partial", "/app")]
         [TestCase("/app/partial/dogs", "/app/dogs")]
         [TestCase("/APP/PARTIAL/dogs", "/app/dogs")]
         [TestCase("/app/partial/dogs/1", "/app/dogs/1")]
@@ -18,6 +23,7 @@ namespace Starcounter.Startup.Tests.Routing.Middleware
                 .Should().BeEquivalentTo(expectedOutput);
         }
 
+        [TestCase("/app", "/app/partial")]
         [TestCase("/app/dogs", "/app/partial/dogs")]
         [TestCase("/APP/dogs", "/app/partial/dogs")]
         [TestCase("/app/dogs/1", "/app/partial/dogs/1")]
@@ -30,6 +36,7 @@ namespace Starcounter.Startup.Tests.Routing.Middleware
         }
 
         [TestCase("/app/dogs", false)]
+        [TestCase("/app/partial", true)]
         [TestCase("/app/partial/dogs/1", true)]
         [TestCase("/APP/PARTIAL/dogs/1", true)] // Self.GET lowers case of blended URIs
         [TestCase("/app/partialdogs/2", false)]

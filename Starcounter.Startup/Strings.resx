@@ -174,4 +174,10 @@
   <data name="UriHelper_MalformedUri" xml:space="preserve">
     <value>URI '{0}' is malformed: URI should start with a '/'</value>
   </data>
+  <data name="Router_ViewModelRegisteredWithPartialUri" xml:space="preserve">
+    <value>View-model {0} is registered with partial URI: '{1}'. Use '{2}' instead</value>
+  </data>
+  <data name="Router_ViewModelRegisteredWithMalformedUri" xml:space="preserve">
+    <value>View-model {0} is registered with malformed URI: '{1}'. URI has to start with a slash sign ('/')</value>
+  </data>
 </root>

@@ -36,6 +36,14 @@ namespace Starcounter.Startup.Routing
             foreach (var urlAttribute in urlAttributes)
             {
                 var pageUri = urlAttribute.Value;
+                if (pageUri[0] != '/')
+                {
+                    throw new InvalidOperationException(StringsFormatted.Router_ViewModelRegisteredWithMalformedUri(pageType, pageUri));
+                }
+                if (UriHelper.IsPartialUri(pageUri))
+                {
+                    throw new InvalidOperationException(StringsFormatted.Router_ViewModelRegisteredWithPartialUri(pageType, pageUri));
+                }
                 if (urlAttribute.External)
                 {
                     HandleGet(pageUri, pageType, handlerOptions);

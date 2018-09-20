@@ -5,7 +5,7 @@ namespace Starcounter.Startup.Routing.Middleware
 {
     public class UriHelper
     {
-        private static readonly Regex PartialUriRegex = new Regex($"^/[^/]+{PartialPart}/", RegexOptions.IgnoreCase);
+        private static readonly Regex PartialUriRegex = new Regex($"^/[^/]+{PartialPart}(/|$)", RegexOptions.IgnoreCase);
         private static readonly Regex TemplateArgumentRegex = new Regex(Regex.Escape("{?}"));
         private const string PartialPart = "/partial";
 
@@ -88,6 +88,10 @@ namespace Starcounter.Startup.Routing.Middleware
         private static string ExtractApplicationName(string partialUri)
         {
             var indexOfSlash = partialUri.IndexOf("/", 1, StringComparison.Ordinal);
+            if (indexOfSlash == -1)
+            {
+                return partialUri.Substring(1);
+            }
             var applicationName = partialUri.Substring(1, indexOfSlash - 1);
             return applicationName;
         }

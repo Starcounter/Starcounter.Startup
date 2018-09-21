@@ -8,14 +8,15 @@
     <OutputPath>bin\$(Configuration)</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <TargetFramework>net462</TargetFramework>
-    <Version>0.6.2</Version>
+    <Version>0.7.0</Version>
     <Authors>Starcounter, joozek78</Authors>
     <PackageProjectUrl>https://github.com/Starcounter/Starcounter.Startup</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Starcounter/Starcounter.Startup</RepositoryUrl>
     <PackageLicenseUrl>https://github.com/Starcounter/Starcounter.Startup/blob/master/LICENSE</PackageLicenseUrl>
     <Description>Bootstrapping library for Starcounter applications. Highly recommended for new 2.4 projects</Description>
     <PackageReleaseNotes>
-      * Fixed a bug where RouterServiceCollectionExtensions.SetMasterPage&lt;T&gt; didn't work at all
+      * MasterPageMiddleware: When Self.GET returns unsuccessful status code, master page is skipped and the response is returned verbatim
+      * Breaking: MasterPage.ExecuteInScope signature is now generic
     </PackageReleaseNotes>
     <PackageTags>Starcounter</PackageTags>
   </PropertyGroup>

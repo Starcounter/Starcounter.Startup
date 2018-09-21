@@ -22,7 +22,7 @@ namespace Starcounter.Startup.Routing.Middleware
                 return next();
             }
 
-            Json CreateBlendedResponse() => Self.GET(UriHelper.PageToPartial(routingInfo.Request.Uri));
+            Response CreateBlendedResponse() => Self.GET(UriHelper.PageToPartial(routingInfo.Request.Uri));
 
             if (_masterPageFactory == null)
             {
@@ -36,6 +36,10 @@ namespace Starcounter.Startup.Routing.Middleware
             }
 
             var scopedBlendedJson = masterPage.ExecuteInScope(CreateBlendedResponse);
+            if (!scopedBlendedJson.IsSuccessStatusCode)
+            {
+                return scopedBlendedJson;
+            }
             masterPage.SetPartial(scopedBlendedJson);
 
             return masterPage;

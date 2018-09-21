@@ -373,7 +373,7 @@ public partial class MasterNavigationPage : MasterPageBase
         InnerJson = partial;
     }
 
-    public override Json ExecuteInScope(Func<Json> innerJsonFactory)
+    public override T ExecuteInScope(Func<T> innerJsonFactory)
     {
         return AttachedScope.Scope(innerJsonFactory);
     }

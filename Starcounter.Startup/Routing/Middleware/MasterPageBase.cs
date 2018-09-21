@@ -15,7 +15,7 @@ namespace Starcounter.Startup.Routing.Middleware
         /// the view-models will be created.
         /// </summary>
         /// <param name="partialViewModelFactory">Creates the partial view-model using Self.GET. This should be executed either in <see cref="Db.Scope"/> or <see cref="IScopeContext.Scope"/></param>
-        public virtual Json ExecuteInScope(Func<Json> partialViewModelFactory)
+        public virtual T ExecuteInScope<T>(Func<T> partialViewModelFactory)
         {
             return Db.Scope(partialViewModelFactory);
         }

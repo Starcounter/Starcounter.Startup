@@ -49,6 +49,35 @@ namespace Starcounter.Startup.Routing
         }
 
         /// <summary>
+        /// Sets the view-model type for the master page. All the responses will be wrapped in this type.
+        /// The MasterPage instance will be saved in <see cref="Starcounter.Session.Store"/> and reused during the next requests.
+        /// </summary>
+        /// <typeparam name="T">The view-model type.</typeparam>
+        /// <param name="services">The service collection to register in.</param>
+        /// <returns>The original service collection.</returns>
+        public static IServiceCollection SetSessionMasterPage<T>(this IServiceCollection services)
+            where T : MasterPageBase
+        {
+            services.AddSingleton<Func<RoutingInfo, MasterPageBase>>(provider => (_) =>
+            {
+                Session.Ensure();
+
+                string key = $"{typeof(RouterServiceCollectionExtensions)}.{typeof(T)}";
+                MasterPageBase masterPage = Session.Current.Store[key] as MasterPageBase;
+
+                if (masterPage == null)
+                {
+                    masterPage = ActivatorUtilities.CreateInstance<T>(provider);
+                    Session.Current.Store[key] = masterPage;
+                }
+
+                return masterPage;
+            });
+
+            return services;
+        }
+
+        /// <summary>
         /// Sets the factory for the master page. All the responses will be wrapped in the master page.
         /// Use this method to control creation of the master page, e.g. wrap it in <see cref="Db.Scope"/>.
         /// </summary>

@@ -6,7 +6,7 @@ namespace Starcounter.Startup.Routing.Middleware
     /// Wraps all responses in a single entity to coordinate blending and common scoping. 
     /// This middleware is enabled by <see cref="RouterServiceCollectionExtensions.AddRouter"/> by default.
     /// </summary>
-    public class MasterPageMiddleware: IPageMiddleware
+    public class MasterPageMiddleware : IPageMiddleware
     {
         private readonly Func<RoutingInfo, MasterPageBase> _masterPageFactory;
 
@@ -22,24 +22,22 @@ namespace Starcounter.Startup.Routing.Middleware
                 return next();
             }
 
-            Response CreateBlendedResponse() => Self.GET(UriHelper.PageToPartial(routingInfo.Request.Uri));
+            Json CreateBlendedResponse() => Self.GET<Json>(UriHelper.PageToPartial(routingInfo.Request.Uri));
 
             if (_masterPageFactory == null)
             {
                 return Db.Scope(CreateBlendedResponse);
             }
 
-            var masterPage = _masterPageFactory(routingInfo);
+            MasterPageBase masterPage = _masterPageFactory(routingInfo);
+
             if (masterPage == null)
             {
                 throw new InvalidOperationException(StringsFormatted.MasterPageMiddleware_MasterPageIsNull());
             }
 
-            var scopedBlendedJson = masterPage.ExecuteInScope(CreateBlendedResponse);
-            if (!scopedBlendedJson.IsSuccessStatusCode)
-            {
-                return scopedBlendedJson;
-            }
+            Json scopedBlendedJson = masterPage.ExecuteInScope(routingInfo, CreateBlendedResponse);
+
             masterPage.SetPartial(scopedBlendedJson);
 
             return masterPage;

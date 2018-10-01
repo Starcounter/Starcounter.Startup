@@ -1,5 +1,6 @@
 ﻿using System;
 using Starcounter.XSON;
+using Starcounter.Startup.Routing;
 
 namespace Starcounter.Startup.Routing.Middleware
 {
@@ -15,7 +16,8 @@ namespace Starcounter.Startup.Routing.Middleware
         /// the view-models will be created.
         /// </summary>
         /// <param name="partialViewModelFactory">Creates the partial view-model using Self.GET. This should be executed either in <see cref="Db.Scope"/> or <see cref="IScopeContext.Scope"/></param>
-        public virtual T ExecuteInScope<T>(Func<T> partialViewModelFactory)
+        public virtual T ExecuteInScope<T>(RoutingInfo routingInfo, Func<T> partialViewModelFactory)
+            where T : Json
         {
             return Db.Scope(partialViewModelFactory);
         }

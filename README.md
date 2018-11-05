@@ -207,7 +207,8 @@ But how is this context object fetched? By default, if the URI has only one para
 public partial class DogViewModel: Json, IBound<Dog>
 {
     [UriToContext]
-    public static Dog HandleContext(string[] args, IDogsRepository dogsRepository)
+    // the name of this method is irrelevant, but calling it UriToContext is a good practice
+    public static Dog UriToContext(string[] args, IDogsRepository dogsRepository)
     {
         // args is guaranteed to have one element, because its only URI has only one parameter
         // returning null will cause the Router to respond with 404

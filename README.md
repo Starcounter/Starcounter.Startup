@@ -16,6 +16,7 @@ Dependency injection for Starcounter 2.4
 - [Dependency injection in view-models](#dependency-injection-in-view-models)
   * [Services registered by default](#services-registered-by-default)
 - [UriHelper](#urihelper)
+- [Startup filters](#startup-filters)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
@@ -500,3 +501,48 @@ public static string WithArguments(string uriTemplate, params string[] arguments
 ```
 
 Returns the supplied URI with its arguments filled. E.g. `WithArguments("/MyApp/partial/dog/{?}", "xyz")` will return `"/MyApp/partial/dog/xyz"`.
+
+## Startup Filters
+
+Usually when you want some code to execute during the startup of the application, you just put it in `Configure` method of your startup class. However, there's a second way to achieve it: define a class implementing `IStartupFilter` interface and register it in `ConfigureServices`. Below is a sample startup filter and a snippet to register it:
+
+```c#
+using System;
+using Microsoft.Extensions.Logging;
+using Starcounter.Startup.Abstractions;
+
+namespace Starcounter.Authorization.Authentication
+{
+    public class LoggingStartupFilter: IStartupFilter
+    {
+        private readonly ILogger<LoggingStartupFilter> _logger;
+
+        public LoggingStartupFilter(ILogger<LoggingStartupFilter> logger)
+        {
+            _logger = logger;
+        }
+
+        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
+        {
+            return app =>
+            {
+                _logger.LogInformation("Application started");
+                next(app);
+            };
+        }
+    }
+}
+```
+
+```c#
+// using Microsoft.Extensions.DependencyInjection;
+// using Starcounter.Startup.Abstractions;
+
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddTransient<IStartupFilter, LoggingStartupFilter>();
+}
+```
+
+This feature is especially useful in libraries, which do not directly control application's startup.
+

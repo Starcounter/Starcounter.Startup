@@ -5,9 +5,9 @@ namespace Starcounter.Startup.Routing.Middleware
 {
     public class InteractionScopeMiddleware : IPageMiddleware
     {
-        private readonly InteractionScopeAttribute.InteractionScopeMode _defaultValue;
+        private readonly InteractionScopeMode _defaultValue;
 
-        public InteractionScopeMiddleware(InteractionScopeAttribute.InteractionScopeMode defaultValue = InteractionScopeAttribute.InteractionScopeMode.AttachOrCreate)
+        public InteractionScopeMiddleware(InteractionScopeMode defaultValue = InteractionScopeMode.AttachOrCreate)
         {
             _defaultValue = defaultValue;
         }
@@ -19,16 +19,14 @@ namespace Starcounter.Startup.Routing.Middleware
             return GetResponseByMode(attribute?.Value ?? _defaultValue, next);
         }
 
-        private Response GetResponseByMode(InteractionScopeAttribute.InteractionScopeMode mode, Func<Response> next)
+        private Response GetResponseByMode(InteractionScopeMode mode, Func<Response> next)
         {
             switch (mode)
             {
-                case InteractionScopeAttribute.InteractionScopeMode.AttachOrCreate:
+                case InteractionScopeMode.AttachOrCreate:
                     return Db.Scope(next);
-                case InteractionScopeAttribute.InteractionScopeMode.AlwaysCreate:
+                case InteractionScopeMode.AlwaysCreate:
                     return new Transaction().Scope(next);
-                case InteractionScopeAttribute.InteractionScopeMode.None:
-                    return next();
             }
 
             return null;

@@ -1,4 +1,4 @@
-﻿namespace Starcounter.Startup.Routing.Enums
+﻿namespace Starcounter.Startup.Routing
 {
     public enum InteractionScopeMode
     {

@@ -1,7 +1,6 @@
 ﻿using System;
-using Starcounter.Startup.Routing.Enums;
 
-namespace Starcounter.Startup.Routing.Middleware
+namespace Starcounter.Startup.Routing
 {
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class InteractionScopeAttribute : Attribute

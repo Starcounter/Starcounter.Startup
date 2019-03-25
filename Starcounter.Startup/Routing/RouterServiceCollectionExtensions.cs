@@ -27,7 +27,7 @@ namespace Starcounter.Startup.Routing
             services.GetRequiredService<IRouter>();
 
         public static IServiceCollection AddInteractionScopeMiddleware(this IServiceCollection services, 
-            InteractionScopeAttribute.InteractionScopeMode defaultMode = InteractionScopeAttribute.InteractionScopeMode.AttachOrCreate)
+            InteractionScopeMode defaultMode = InteractionScopeMode.AttachOrCreate)
         {
             services
                 .TryAddEnumerable(

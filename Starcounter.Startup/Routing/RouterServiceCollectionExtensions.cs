@@ -26,12 +26,12 @@ namespace Starcounter.Startup.Routing
         public static IRouter GetRouter(this IServiceProvider services) =>
             services.GetRequiredService<IRouter>();
 
-        [Obsolete("MasterPageMiddleware is now responsible for creating a scope, and it's included by default in AddRouter")]
-        public static IServiceCollection AddDbScopeMiddleware(this IServiceCollection services, bool enableScopeByDefault = true)
+        public static IServiceCollection AddInteractionScopeMiddleware(this IServiceCollection services, 
+            InteractionScopeMode defaultMode = InteractionScopeMode.AttachOrCreate)
         {
             services
                 .TryAddEnumerable(
-                    ServiceDescriptor.Transient<IPageMiddleware, DbScopeMiddleware>((_) => new DbScopeMiddleware(enableScopeByDefault)));
+                    ServiceDescriptor.Transient<IPageMiddleware, InteractionScopeMiddleware>((_) => new InteractionScopeMiddleware(defaultMode)));
             return services;
         }
 

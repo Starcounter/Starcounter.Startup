@@ -8,7 +8,7 @@
     <OutputPath>bin\$(Configuration)</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <TargetFramework>net462</TargetFramework>
-    <Version>0.7.0</Version>
+    <Version>0.8.0</Version>
     <Authors>Starcounter, joozek78</Authors>
     <PackageProjectUrl>https://github.com/Starcounter/Starcounter.Startup</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Starcounter/Starcounter.Startup</RepositoryUrl>

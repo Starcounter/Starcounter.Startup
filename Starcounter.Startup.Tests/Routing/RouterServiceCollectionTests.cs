@@ -51,24 +51,24 @@ namespace Starcounter.Startup.Tests.Routing
         }
 
         [Test]
-        public void AddDbScopeMiddlewareConfiguresService()
+        public void AddInteractionScopeMiddlewareConfiguresService()
         {
             var serviceCollection = new ServiceCollection();
 
-            serviceCollection.AddDbScopeMiddleware();
+            serviceCollection.AddInteractionScopeMiddleware();
 
             serviceCollection.BuildServiceProvider().GetServices<IPageMiddleware>()
-                .Should().ContainItemsAssignableTo<DbScopeMiddleware>();
+                .Should().ContainItemsAssignableTo<InteractionScopeMiddleware>();
         }
 
         [Test]
-        public void AddDbScopeMiddlewareCalledIsIdempotent()
+        public void AddInteractionScopeMiddlewareCalledIsIdempotent()
         {
             var serviceCollection = new ServiceCollection();
 
             serviceCollection
-                .AddDbScopeMiddleware()
-                .AddDbScopeMiddleware();
+                .AddInteractionScopeMiddleware()
+                .AddInteractionScopeMiddleware();
 
             serviceCollection.BuildServiceProvider().GetServices<IPageMiddleware>()
                 .Should().HaveCount(1);

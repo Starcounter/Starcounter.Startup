@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("7739a363-e672-476d-b560-f9f1084dfa35")]
 
-[assembly: AssemblyVersion("0.9.1")]
-[assembly: AssemblyInformationalVersion("0.9.1")]
+[assembly: AssemblyVersion("0.9.0")]
+[assembly: AssemblyInformationalVersion("0.9.0")]
 
 [assembly: InternalsVisibleTo("Starcounter.Startup.Tests")]

@@ -8,14 +8,16 @@
     <OutputPath>bin\$(Configuration)</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <TargetFramework>net462</TargetFramework>
-    <Version>0.9.0</Version>
+    <Version>0.9.1</Version>
     <Authors>Starcounter, joozek78</Authors>
     <PackageProjectUrl>https://github.com/Starcounter/Starcounter.Startup</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Starcounter/Starcounter.Startup</RepositoryUrl>
     <PackageLicenseUrl>https://github.com/Starcounter/Starcounter.Startup/blob/master/LICENSE</PackageLicenseUrl>
     <Description>Bootstrapping library for Starcounter applications. Highly recommended for new 2.4 projects</Description>
-    <PackageReleaseNotes>Update NuGet packages: Microsoft.Extensions.* to 2.2.0</PackageReleaseNotes>
+    <PackageReleaseNotes>    * Added separate LICENSE file
+    * Added .nuspec file</PackageReleaseNotes>
     <PackageTags>Starcounter</PackageTags>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
@@ -53,4 +55,7 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Starcounter.Startup.nuspec" />
+  </ItemGroup>
 </Project>

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>Starcounter, joozek78</authors>
+    <owners>Starcounter</owners>
+    <license type="file">LICENSE.txt</license>
+    <projectUrl>https://github.com/Starcounter/Starcounter.Startup</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>$description$</summary>
+    <description>$description$</description>
+    <releaseNotes>Were added LICENSE and .nuspec files</releaseNotes>
+    <copyright>$copyright$</copyright>
+    <tags>Starcounter Startup</tags>
+  </metadata>
+  <files>
+    <file src="..\LICENSE.txt" target="" />
+  </files>
+</package>
